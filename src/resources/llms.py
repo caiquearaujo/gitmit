@@ -8,7 +8,7 @@ from src.resources.types import get_commit_types_resume
 from src.resources.files import load_all
 
 
-def resume_changes_message(repo: git.Repo, explanation: str = None) -> str:
+def prompt_resume_changes(repo: git.Repo, explanation: str = None) -> Optional[str]:
     """Resume the changes on the given repository.
 
     Args:
@@ -46,9 +46,9 @@ def resume_changes_message(repo: git.Repo, explanation: str = None) -> str:
     return "\n".join(contents)
 
 
-def commit_from_resume_message(
-    repo: git.Repo, resume: str, explanation: str = None
-) -> str:
+def prompt_commit_from_resume(
+    resume: str, explanation: Optional[str] = None
+) -> Optional[str]:
     """Generate a commit message from the resume of the changes.
 
     Args:
@@ -59,11 +59,6 @@ def commit_from_resume_message(
     Returns:
         str: The generated commit message.
     """
-    changes = load_all(repo)
-
-    if changes is None:
-        return None
-
     contents = [
         "You are a helpful assistant that generates commit messages for changes on a git repository.",
         "You should generate a commit message from the resume below and set the commit type based on it.",
@@ -91,7 +86,9 @@ def commit_from_resume_message(
     return "\n".join(contents)
 
 
-def commit_message(repo: git.Repo, explanation: str = None) -> Optional[str]:
+def prompt_commit_from_files(
+    repo: git.Repo, explanation: Optional[str] = None
+) -> Optional[str]:
     """Generate a commit message for the changes on the given repository.
 
     Args:
