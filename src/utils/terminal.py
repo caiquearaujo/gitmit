@@ -45,6 +45,11 @@ def display_info(message: str) -> None:
     console.print(message, style="bold blue")
 
 
+def clear():
+    """Clear the terminal."""
+    console.clear()
+
+
 def ask(
     question: str,
     default: str = None,
@@ -158,12 +163,14 @@ def choose(
         console.clear()
 
     console.print(question, style="bold cyan")
+    console.print("")
     zfill = len(str(len(choices)))
 
     for index, option in enumerate(choices, start=1):
         console.print(f"[bold yellow]{str(index).zfill(zfill)}.[/bold yellow] {option}")
 
     while True:
+        console.print("")
         choice = Prompt.ask(
             "Enter the number of your choice",
             console=console,

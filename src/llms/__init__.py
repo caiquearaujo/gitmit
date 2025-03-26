@@ -39,7 +39,7 @@ class LLMService(ABC):
         self,
         repo: Repo,
         explanation: Optional[str] = None,
-        resume: Optional[any] = None,
+        resume: Optional["LLMService"] = None,
     ) -> Optional[CommitMessage]:
         """Generate a commit message.
 

@@ -45,20 +45,7 @@ class GoogleLLMService(LLMService):
             repo (git.Repo): The repository to resume the changes for.
             explanation (str, optional): The explanation of the changes. Defaults to None.
         """
-        prompt = llms.prompt_resume_changes(repo, explanation)
-
-        if prompt is None:
-            return None
-
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-        )
-
-        if response is None:
-            raise ValueError("No response from the LLM")
-
-        return response.text
+        raise NotImplementedError("Google LLM does not support resume changes")
 
     def commit_message(
         self,
