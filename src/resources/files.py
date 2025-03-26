@@ -94,6 +94,6 @@ def load_all(repo: Repo) -> Union[str, None]:
     for file in files:
         txt.append(f">>>> {file.name} ({file.type.value})")
         txt.append(file.content)
-        txt.append("<<<<")
+        txt.append("<<<< end of file")
 
     return "\n".join(txt)
