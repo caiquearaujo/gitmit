@@ -59,6 +59,8 @@ def main(args):
             "The command {command} was not found.".format(command=args.command),
         )
 
+        return
+
     if type(func) == dict:
         func = func.get(args.action, False)
 
