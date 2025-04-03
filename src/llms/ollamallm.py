@@ -75,14 +75,7 @@ class OllamaLLMService(LLMService):
             explanation (str, optional): The explanation of the changes. Defaults to None.
             resume (LLMService, optional): The resume of the changes. Defaults to None.
         """
-        prompt = None
-
-        if resume is not None:
-            prompt = llms.prompt_commit_from_resume(
-                resume.resume_changes(repo, explanation), explanation
-            )
-        else:
-            prompt = llms.prompt_commit_from_files(repo, explanation)
+        prompt = llms.prompt_commit_from_files(repo, explanation)
 
         if prompt is None:
             return None

@@ -40,8 +40,7 @@ def load_untracked_files(repo: Repo) -> list[File]:
                 content = f.read()
                 files.append(File(name=file, content=content, type=FileType.UNTRACKED))
         except Exception as e:
-            # display warning but ignore
-            display_warning(f"Cannot load file {file}: {e}")
+            files.append(File(name=file, content="<unknown>", type=FileType.UNTRACKED))
             continue
 
     return files

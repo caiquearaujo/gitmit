@@ -1,7 +1,7 @@
 """Service for the configuration of the application."""
 
 import configparser
-
+import os
 from typing import Optional
 
 from pathlib import Path
@@ -157,7 +157,7 @@ def __read(config: configparser.ConfigParser, file: str):
     config.read(file)
 
 
-def __write(config: configparser.ConfigParser, file: str):
+def __write(config: configparser.ConfigParser, file: str, chmod: bool = False):
     """Write the config to the file.
 
     Args:
@@ -165,6 +165,9 @@ def __write(config: configparser.ConfigParser, file: str):
     """
     with open(file, "w", encoding="utf-8") as f:
         config.write(f)
+
+    if chmod:
+        os.chmod(file, 0o600)
 
 
 def __create(config: configparser.ConfigParser, file: str):
@@ -179,7 +182,7 @@ def __create(config: configparser.ConfigParser, file: str):
     }
 
     config["google"] = {
-        "api_key": "",
+        "api_key": "<your-google-api-key>",
     }
 
     config["ollama"] = {
@@ -190,7 +193,7 @@ def __create(config: configparser.ConfigParser, file: str):
         "host": "localhost",
         "port": 3306,
         "user": "root",
-        "password": "",
+        "password": "<your-mysql-password>",
         "database": "gitmit",
     }
 

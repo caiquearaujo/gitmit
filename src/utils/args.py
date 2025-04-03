@@ -92,6 +92,7 @@ def parse_args():
 
     subparsers = parser.add_subparsers(dest="command", help="Command to be executed.")
 
+    subparsers.add_parser("config", help="Creates the configuration file.")
     __commit_parser(subparsers)
     __init_parser(subparsers)
 

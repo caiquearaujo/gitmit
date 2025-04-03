@@ -22,6 +22,12 @@ def signal_handler(signum, frame):
 
 
 def main(args):
+    if args.command == "config":
+        display_info(
+            "Config file created successfully. See at: [bold yellow]~/.config/gitmit/config.ini[/bold yellow]"
+        )
+        return
+
     service = GitService(args.path)
 
     env = [
