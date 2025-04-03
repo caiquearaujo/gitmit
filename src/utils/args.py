@@ -37,6 +37,18 @@ class CheckOriginAction(argparse.Action):
         parser.error("The origin URL is not valid.")
 
 
+class CheckRepoAction(argparse.Action):
+    def __is_valid_repo(self, repo: str) -> bool:
+        return re.match(r"^[\w\.-]+/[\w\.-]+$", repo) is not None
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if self.__is_valid_repo(values):
+            setattr(namespace, self.dest, values)
+            return
+
+        parser.error("The repository is not valid.")
+
+
 def __commit_parser(subparsers: argparse._SubParsersAction):
     parser = subparsers.add_parser("commit", help="Commit all changes.")
 
@@ -74,6 +86,21 @@ def __init_parser(subparsers: argparse._SubParsersAction):
     return parser
 
 
+def __update_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("update", help="Update the tool.")
+
+    parser.add_argument(
+        "-r",
+        "--repo",
+        help="Set the user/repository to check for updates.",
+        default="caiquearaujo/gitmit",
+        type=str,
+        action=CheckRepoAction,
+    )
+
+    return parser
+
+
 def parse_args(version: str):
     parser = argparse.ArgumentParser(
         prog="GitMit",
@@ -103,5 +130,5 @@ def parse_args(version: str):
     subparsers.add_parser("config", help="Creates the configuration file.")
     __commit_parser(subparsers)
     __init_parser(subparsers)
-
+    __update_parser(subparsers)
     return parser.parse_args()
