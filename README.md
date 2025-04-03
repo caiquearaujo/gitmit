@@ -37,12 +37,15 @@ The main goal for this feature is keeping track the token usage across different
 
 ### From Release
 
-1. Download the latest release file from the [GitHub releases page](https://github.com/caiquearaujo/gitmit/releases)
-2. Move the downloaded file to `/usr/local/bin/gitmit`
+1. Download the latest release file from the [GitHub releases page](https://github.com/caiquearaujo/gitmit/releases);
+2. Move the downloaded file to `/usr/local/bin/gitmit` or any other directory you want;
 3. Make the file executable:
    ```bash
+	# You may need to use sudo to make the file executable
    chmod +x /usr/local/bin/gitmit
    ```
+
+> When you set another bin directory, you need to update the `PATH` environment variable to include the new directory.
 
 ### From Source
 
@@ -64,14 +67,18 @@ The main goal for this feature is keeping track the token usage across different
    ```bash
 	python build.py
    ```
-5. Move the file to `/usr/local/bin/gitmit`:
+5. Move the file to `/usr/local/bin/gitmit` or any other directory you want:
    ```bash
+	# You may need to use sudo to move the file to the bin directory
 	mv /tmp/gitmit/gitmit-x.x.x.pex /usr/local/bin/gitmit
    ```
 6. Make the file executable:
    ```bash
-   chmod +x /usr/local/bin/gitmit
+	# You may need to use sudo to make the file executable
+	chmod +x /usr/local/bin/gitmit
    ```
+
+> When you set another bin directory, you need to update the `PATH` environment variable to include the new directory.
 
 ## Configuration
 
