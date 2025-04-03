@@ -74,7 +74,6 @@ def __evaluate(config: configparser.ConfigParser, path: str):
     )
 
     database = LLMUsageDatabaseService(connection)
-    database.start()
 
     services = {
         "google": lambda c, m: GoogleLLMService(

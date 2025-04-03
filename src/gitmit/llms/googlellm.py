@@ -28,6 +28,7 @@ class GoogleLLMService(LLMService):
 
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
+        self.database.start()
         return self.database.current_month_tokens_used(f"google/{self.model}")
 
     def count_tokens(
@@ -87,6 +88,7 @@ class GoogleLLMService(LLMService):
             explanation (str, optional): The explanation of the changes. Defaults to None.
             resume (LLMService, optional): The resume of the changes. Defaults to None.
         """
+        self.database.start()
         prompt = None
 
         if resume is not None:

@@ -35,6 +35,9 @@ class LLMUsageDatabaseService:
 
     def start(self):
         """Start the connection to the database."""
+        if self.connected:
+            return self.mysql_client
+
         try:
             self.mysql_client = mysql.connector.connect(
                 pool_name="gitmit_pool",
