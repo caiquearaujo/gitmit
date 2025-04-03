@@ -20,6 +20,7 @@ class Services(BaseModel):
     commit: LLMService
     resume: Optional[LLMService]
     database: LLMUsageDatabaseService
+    path: str
 
     class Config:
         arbitrary_types_allowed = True
@@ -58,7 +59,7 @@ def __parse_model(model: str, allow_none=False) -> Optional[dict[str, str]]:
     return {"service": parts[0], "model": parts[1]}
 
 
-def __evaluate(config: configparser.ConfigParser):
+def __evaluate(config: configparser.ConfigParser, path: str):
     """Evaluate the config.
 
     Args:
@@ -125,6 +126,7 @@ def __evaluate(config: configparser.ConfigParser):
             else None
         ),
         database=database,
+        path=path,
     )
 
 
@@ -145,7 +147,7 @@ def init():
     else:
         __read(config, file)
 
-    return __evaluate(config)
+    return __evaluate(config, file)
 
 
 def __read(config: configparser.ConfigParser, file: str):

@@ -32,6 +32,7 @@ def startup(args):
     service = GitService(args.path)
 
     env = [
+        f"Configuration file: [bold yellow]{config.path}[/bold yellow]",
         f"Working directory: [bold yellow]{service.getPath()}[/bold yellow]",
     ]
 
