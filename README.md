@@ -128,6 +128,8 @@ database = gitmit
 
 ### Initialize a Repository
 
+It will be used to initialize a new repository.
+
 ```bash
 gitmit init [options]
 ```
@@ -142,6 +144,8 @@ gitmit init --dev --origin https://github.com/username/repo.git
 ```
 
 ### Commit Changes
+
+It will be used to commit the changes to the current branch.
 
 ```bash
 gitmit commit [options]
@@ -159,6 +163,19 @@ gitmit commit --push
 When committing, you'll be presented with two options:
 1. 🤖 Generated: AI will analyze your changes and generate an appropriate commit message;
 2. 🥵 Manual: You can manually create a commit message following the standardized format.
+
+### Update
+
+It will be used to update the tool to the latest version. Only supported to the official repository.
+
+```bash
+gitmit update 
+```
+
+Example:
+```bash
+gitmit update
+```
 
 ### Commit Types
 
@@ -187,7 +204,6 @@ Gitmit supports various commit types with corresponding emojis:
 | 🚑 | critical | Critical changes |
 | 👌 | review | Code review changes |
 | 🧱 | other | Other changes |
-
 
 ## Upgrades & Integrations
 

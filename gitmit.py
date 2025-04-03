@@ -10,6 +10,7 @@ from src.utils.terminal import display_success, display_error, display_info, Pan
 from src.resources.types import get_commit_types_resume
 
 __VERSION__ = "0.1.0"
+__REPO__ = "caiquearaujo/gitmit"
 config = init()
 
 
@@ -54,7 +55,7 @@ def startup(args):
             services=config,
             settings=InitSettings(dev=args.dev, origin=args.origin),
         ).run(),
-        "update": lambda: UpdateTool(__VERSION__, args.repo).run(),
+        "update": lambda: UpdateTool(__VERSION__, __REPO__).run(),
     }
 
     func = switcher.get(args.command, False)

@@ -89,15 +89,6 @@ def __init_parser(subparsers: argparse._SubParsersAction):
 def __update_parser(subparsers: argparse._SubParsersAction):
     parser = subparsers.add_parser("update", help="Update the tool.")
 
-    parser.add_argument(
-        "-r",
-        "--repo",
-        help="Set the user/repository to check for updates.",
-        default="caiquearaujo/gitmit",
-        type=str,
-        action=CheckRepoAction,
-    )
-
     return parser
 
 
