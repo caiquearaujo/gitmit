@@ -44,6 +44,16 @@ class CommitTypeProps(BaseModel):
     commit_title: str
 
 
+class CommitMessage(BaseModel):
+    """Commit message."""
+
+    type: CommitType
+    scope: str
+    short_description: str
+    description: str
+    reason: str
+
+
 def get_commit_types() -> list[CommitTypeProps]:
     """Get the commit types.
 

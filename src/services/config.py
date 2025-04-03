@@ -8,6 +8,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from src.services.database import ConnectionModel, LLMUsageDatabaseService
 from src.llms.ollamallm import OllamaLLMService
 from src.llms.googlellm import GoogleLLMService
 from src.llms import LLMService
@@ -18,6 +19,7 @@ class Services(BaseModel):
 
     commit: LLMService
     resume: Optional[LLMService]
+    database: LLMUsageDatabaseService
 
     class Config:
         arbitrary_types_allowed = True
@@ -62,9 +64,20 @@ def __evaluate(config: configparser.ConfigParser):
     Args:
         config (configparser.ConfigParser): The config to evaluate.
     """
+    connection = ConnectionModel(
+        host=config.get("mysql", "host"),
+        port=config.get("mysql", "port"),
+        user=config.get("mysql", "user"),
+        password=config.get("mysql", "password"),
+        database=config.get("mysql", "database"),
+    )
+
+    database = LLMUsageDatabaseService(connection)
+    database.start()
+
     services = {
         "google": lambda c, m: GoogleLLMService(
-            api_key=c.get("google", "api_key"), model=m
+            api_key=c.get("google", "api_key"), database=database, model=m
         ),
         "ollama": lambda c, m: OllamaLLMService(host=c.get("ollama", "host"), model=m),
     }
@@ -111,6 +124,7 @@ def __evaluate(config: configparser.ConfigParser):
             if resume_model
             else None
         ),
+        database=database,
     )
 
 
@@ -170,6 +184,14 @@ def __create(config: configparser.ConfigParser, file: str):
 
     config["ollama"] = {
         "host": "http://localhost:11434",
+    }
+
+    config["mysql"] = {
+        "host": "localhost",
+        "port": 3306,
+        "user": "root",
+        "password": "",
+        "database": "gitmit",
     }
 
     __write(config, file)

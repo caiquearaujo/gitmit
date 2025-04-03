@@ -1,10 +1,10 @@
 """Module for displaying messages in the terminal."""
 
-from typing import Callable
+from typing import Callable, Optional
 
 from rich.console import Console
 from rich.prompt import Prompt
-
+from rich.panel import Panel
 
 console = Console()
 
@@ -146,8 +146,11 @@ def ask_confirmation(question: str, default: str = "y", clean: bool = True) -> b
 
 
 def choose(
-    question: str, choices: list[str], default: int = None, clean: bool = True
-) -> str:
+    question: str,
+    choices: list[str],
+    default: Optional[int] = None,
+    clean: bool = True,
+) -> int:
     """Choose an option from a list of choices.
 
     Args:
@@ -159,42 +162,61 @@ def choose(
     Returns:
         str: The chosen option.
     """
-    if clean:
-        console.clear()
+    try:
+        if clean:
+            console.clear()
 
-    console.print(question, style="bold cyan")
-    console.print("")
-    zfill = len(str(len(choices)))
+        console.print(Panel(question, style="bold cyan"))
 
-    for index, option in enumerate(choices, start=1):
-        console.print(f"[bold yellow]{str(index).zfill(zfill)}.[/bold yellow] {option}")
+        zfill = len(str(len(choices)))
 
-    while True:
-        console.print("")
-        choice = Prompt.ask(
-            "Enter the number of your choice",
-            console=console,
-            default=default,
-            show_default=False,
-        )
-
-        if choice == "" or choice is None:
-            if default is not None:
-                return choices[default - 1]
-
+        for index, option in enumerate(choices, start=1):
             console.print(
-                "This field is required. Please provide a value for it.",
-                style="bold red",
+                f"[bold yellow]{str(index).zfill(zfill)}.[/bold yellow] {option}"
             )
 
-            continue
+        choose_message = "Enter the number of your choice"
 
-        if choice.isdigit():
-            num = int(choice)
-            if 1 <= num <= len(choices):
-                return choices[num - 1]
+        if default is not None:
+            choose_message = (
+                f"{choose_message} [bold yellow]({choices[default - 1]})[/bold yellow]"
+            )
 
-        console.print(
-            f"Invalid choice: {choice}. Please choose a valid option.",
-            style="bold red",
-        )
+        while True:
+            choice = Prompt.ask(
+                choose_message,
+                console=console,
+                default=default,
+                show_default=False,
+            )
+
+            try:
+                choice = int(choice)
+            except Exception:
+                console.print(
+                    f"Invalid choice: {str(choice)}. Please choose a valid option.",
+                    style="bold red",
+                )
+
+                continue
+
+            if choice == 0 or choice is None or choice.is_integer() is False:
+                if default is not None and choices[default - 1]:
+                    return default - 1
+
+                console.print(
+                    "This field is required. Please provide a value for it.",
+                    style="bold red",
+                )
+
+                continue
+
+            if 0 <= choice - 1 < len(choices):
+                return choice - 1
+
+            console.print(
+                f"Invalid choice: {str(choice)}. Please choose a valid option.",
+                style="bold red",
+            )
+    except KeyboardInterrupt:
+        console.print("Aborted.", style="bold red")

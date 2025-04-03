@@ -5,8 +5,8 @@ from typing import Optional
 from ollama import Client
 from git import Repo
 
-from src.llms import LLMService
-from src.tools.commit import CommitMessage
+from src.llms import LLMService, LLMAction
+from src.resources.types import CommitMessage
 
 from src.resources import llms
 
@@ -21,7 +21,16 @@ class OllamaLLMService(LLMService):
         self.client = Client(host=host)
         self.model = model
 
-    def count_tokens(self, prompt: str) -> int:
+    def tokens_used(self) -> int:
+        """Get the number of tokens used."""
+        raise NotImplementedError("Tokens used is not implemented for Ollama LLM")
+
+    def count_tokens(
+        self,
+        repo: Repo,
+        explanation: Optional[str] = None,
+        resume: Optional["LLMService"] = None,
+    ) -> int:
         """Count the tokens in the prompt.
 
         Args:
@@ -49,7 +58,7 @@ class OllamaLLMService(LLMService):
         )
 
         if response is None:
-            raise ValueError("No response from the LLM")
+            return None
 
         return response["response"]
 
@@ -85,6 +94,17 @@ class OllamaLLMService(LLMService):
         )
 
         if response is None:
-            raise ValueError("No response from the LLM")
+            return None
 
         return CommitMessage.model_validate_json(response["response"])
+
+    def supports(self, action: LLMAction) -> bool:
+        """Check if the LLM supports the action.
+
+        Args:
+            action (str): The action to check.
+
+        Returns:
+            bool: True if the LLM supports the action, False otherwise.
+        """
+        return action in [LLMAction.RESUME_CHANGES, LLMAction.COMMIT_MESSAGE]
