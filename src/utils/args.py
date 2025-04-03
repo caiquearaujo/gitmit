@@ -74,7 +74,7 @@ def __init_parser(subparsers: argparse._SubParsersAction):
     return parser
 
 
-def parse_args():
+def parse_args(version: str):
     parser = argparse.ArgumentParser(
         prog="GitMit",
         description="GitMit: A simple Git repository manager based on GitFlow requirements.",
@@ -88,6 +88,14 @@ def parse_args():
         type=pathlib.Path,
         default=os.getcwd(),
         action=CheckPathAction,
+    )
+
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="Show the current version of the tool.",
+        action="version",
+        version=f"GitMit v{version}",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Command to be executed.")

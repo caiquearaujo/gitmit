@@ -8,6 +8,7 @@ from src.utils.args import parse_args
 from src.utils.terminal import display_success, display_error, display_info, Panel
 from src.resources.types import get_commit_types_resume
 
+__VERSION__ = "0.1.0"
 config = init()
 
 
@@ -79,9 +80,10 @@ def startup(args):
 def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+    args = parse_args(__VERSION__)
 
     try:
-        startup(parse_args())
+        startup(args)
     except Exception as e:
         display_error(f"An unexpected error occurred. See: {e}.")
     finally:

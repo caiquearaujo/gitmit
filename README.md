@@ -62,11 +62,12 @@ The main goal for this feature is keeping track the token usage across different
    ```
 4. Build the executable:
    ```bash
-   pyinstaller --onefile gitmit.py
+	python build.py
    ```
-5. Create a symbolic link:
+5. Move the file to `/usr/local/bin/gitmit`:
    ```bash
-   sudo ln -s $(pwd)/dist/gitmit /usr/local/bin/gitmit
+	mv /tmp/gitmit/gitmit-x.x.x.pyz /usr/local/bin/gitmit
+   ```
 6. Make the file executable:
    ```bash
    chmod +x /usr/local/bin/gitmit
