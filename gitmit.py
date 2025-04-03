@@ -22,7 +22,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def main(args):
+def startup(args):
     if args.command == "config":
         display_info(
             "Config file created successfully. See at: [bold yellow]~/.config/gitmit/config.ini[/bold yellow]"
@@ -75,14 +75,18 @@ def main(args):
     func()
 
 
-if __name__ == "__main__":
+def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
     try:
-        main(parse_args())
+        startup(parse_args())
     except Exception as e:
         display_error(f"An unexpected error occurred. See: {e}.")
     finally:
         close_all()
         display_success("Bye, bye 🖖")
+
+
+if __name__ == "__main__":
+    main()
