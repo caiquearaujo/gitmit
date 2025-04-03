@@ -6,6 +6,7 @@ from src.tools.commit import CommitTool, CommitSettings
 from src.tools.init import InitTool, InitSettings
 from src.utils.args import parse_args
 from src.utils.terminal import display_success, display_error, display_info, Panel
+from src.resources.types import get_commit_types_resume
 
 config = init()
 

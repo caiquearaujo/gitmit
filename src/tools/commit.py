@@ -173,7 +173,7 @@ class CommitTool:
         )
 
         for _type in get_commit_types():
-            if _type.commit_type.__eq__(commit_message.type):
+            if _type.commit_type.name == commit_message.type.name:
                 founded_type = _type
                 break
 

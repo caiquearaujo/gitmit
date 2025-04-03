@@ -225,16 +225,11 @@ def get_commit_types() -> list[CommitTypeProps]:
 
 
 def get_commit_types_resume() -> str:
-    """Get the commit types resume as a JSON string.
+    """Get the commit types resume as a CSV string.
 
-    Returns: A JSON string containing the commit types.
+    Returns: A CSV string containing the commit types.
     """
-    resume = [
-        {
-            "type": x.commit_type.value,
-            "meaning": x.commit_meaning,
-        }
-        for x in get_commit_types()
-    ]
-
-    return json.dumps(resume)
+    return "type;meaning\n" + "\n".join(
+        f"{item.commit_type.value.upper()};{item.commit_meaning}"
+        for item in get_commit_types()
+    )
