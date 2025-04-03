@@ -5,7 +5,7 @@ from src.services.git import GitService
 from src.tools.commit import CommitTool, CommitSettings
 from src.tools.init import InitTool, InitSettings
 from src.utils.args import parse_args
-from src.utils.terminal import display_success, display_error, display_warning, Panel
+from src.utils.terminal import display_success, display_error, display_info, Panel
 
 config = init()
 
@@ -22,9 +22,16 @@ def signal_handler(signum, frame):
 
 
 def main(args):
-    display_warning(Panel(f"Working directory: [bold purple]{args.path}[/bold purple]"))
-
     service = GitService(args.path)
+
+    env = [
+        f"Working directory: [bold yellow]{service.getPath()}[/bold yellow]",
+    ]
+
+    if service.exists():
+        env.append(f"Branch: [bold yellow]{service.currentBranch()}[/bold yellow]")
+
+    display_info(Panel("\n".join(env), title="Environment"))
 
     switcher = {
         "commit": lambda: CommitTool(

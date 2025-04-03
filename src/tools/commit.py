@@ -46,7 +46,6 @@ class CommitTool:
     def run(self):
         """Run the commit tool."""
         branch = self.git_service.currentBranch()
-        display_warning(Panel(f"Current branch: [bold purple]{branch}[/bold purple]"))
 
         if self.git_service.hasChanges() is False:
             display_warning("No changes to commit.")

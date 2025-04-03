@@ -42,7 +42,6 @@ class InitTool:
         self.git_service.renameTo("main")
 
         if self.settings.origin != "":
-            # @todo check if origin is valid
             self.git_service.remote(self.settings.origin, "origin")
             self.git_service.pushTo("main")
 

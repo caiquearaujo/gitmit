@@ -49,7 +49,10 @@ class GitService:
         Returns:
             str: The path to the Git repository.
         """
-        return self.path
+        if self.repo == False:
+            return self.path
+
+        return self.repo.working_dir
 
     def commit(self, message: str):
         """Commit the changes.
