@@ -81,6 +81,8 @@ The main goal for this feature is keeping track the token usage across different
    ```
 2. The configuration file will be created at `~/.config/gitmit/config.ini`. Edit it with your preferred text editor.
 
+> The configuration file will be written with `600` permissions, so it will be readable only by the current user.
+
 ### Configuration Options
 
 #### Models Section
@@ -94,6 +96,8 @@ commit = google/gemini-2.0-flash
 # Leave empty to disable
 resume = ollama/codellama
 ```
+
+> The available LLM services are: `google` and `ollama`. You can use any model supported by services, make sure to use the correct model name.
 
 #### Google Section
 ```ini
