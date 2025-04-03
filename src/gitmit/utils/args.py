@@ -89,6 +89,12 @@ def __init_parser(subparsers: argparse._SubParsersAction):
 def __update_parser(subparsers: argparse._SubParsersAction):
     parser = subparsers.add_parser("update", help="Update the tool.")
 
+    parser.add_argument(
+        "--force",
+        help="Force the update of the tool.",
+        action="store_true",
+    )
+
     return parser
 
 

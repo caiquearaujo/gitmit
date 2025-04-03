@@ -1,6 +1,8 @@
 import requests
 import shutil
 import sys
+import os
+import uuid
 
 from pydantic import BaseModel
 from rich.progress import Progress
@@ -16,7 +18,7 @@ class UpdateTool:
         self.version = version
         self.repo = repo
 
-    def run(self):
+    def run(self, force: bool = False):
         """Run the update tool."""
         response = requests.get(
             f"https://api.github.com/repos/{self.repo}/releases/latest"
@@ -30,17 +32,18 @@ class UpdateTool:
         latest_version = release_info.get("tag_name")
         current_version = self.version
 
-        if latest_version == current_version:
+        if latest_version == current_version and not force:
             display_success("You are already on the latest version.")
             return
 
         asset_url = f"https://github.com/{self.repo}/releases/download/{latest_version}/gitmit-{latest_version}.pex"
-        temp_path = "/tmp/gitmit.pex"
+        temp_path = f"/tmp/gitmit-{uuid.uuid4()}.pex"
 
         self.__download(asset_url, temp_path)
 
         try:
             shutil.copy(temp_path, sys.argv[0])
+            os.chmod(sys.argv[0], 0o755)
             display_success("Update successful!")
         except Exception as e:
             display_error(f"Error updating the file: {e}")

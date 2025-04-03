@@ -60,7 +60,7 @@ def startup(args):
             services=config,
             settings=InitSettings(dev=args.dev, origin=args.origin),
         ).run(),
-        "update": lambda: UpdateTool(__VERSION__, __REPO__).run(),
+        "update": lambda: UpdateTool(__VERSION__, __REPO__).run(args.force),
     }
 
     func = switcher.get(args.command, False)
