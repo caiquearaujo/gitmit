@@ -86,10 +86,12 @@ class LLMUsageDatabaseService:
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS `tokens_counter` (
-                    `timestamp` TIMESTAMP NULL DEFAULT NULL,
-                    `year` SMALLINT NULL DEFAULT NULL,
-                    `month` TINYINT NULL DEFAULT NULL,
-                    `tokens_used` MEDIUMINT NULL DEFAULT NULL
+                    `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    `year` SMALLINT NOT NULL,
+                    `month` TINYINT NOT NULL,
+                    `tokens_used` MEDIUMINT NOT NULL,
+                    `model` VARCHAR(255) NOT NULL,
+                    `crc_model` INT UNSIGNED GENERATED ALWAYS AS (CRC32(model)) STORED
                 )
                 """
             )
@@ -101,7 +103,7 @@ class LLMUsageDatabaseService:
         finally:
             cursor.close()
 
-    def insert_token_usage(self, tokens_used: int):
+    def insert_token_usage(self, tokens_used: int, model: str):
         """Insert the token usage into the table.
 
         Args:
@@ -111,7 +113,6 @@ class LLMUsageDatabaseService:
 
         year = timestamp.year
         month = timestamp.month
-        timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
 
         if self.mysql_client is None:
             display_error("You must start the MySQL client before continue.")
@@ -121,8 +122,8 @@ class LLMUsageDatabaseService:
             cursor = self.mysql_client.cursor()
 
             cursor.execute(
-                "INSERT INTO `tokens_counter` (`timestamp`, `year`, `month`, `tokens_used`) VALUES (%s, %s, %s, %s)",
-                (timestamp_str, year, month, tokens_used),
+                "INSERT INTO `tokens_counter` (`year`, `month`, `tokens_used`, `model`) VALUES (%s, %s, %s, %s)",
+                (year, month, tokens_used, model),
             )
 
             self.mysql_client.commit()
@@ -132,7 +133,7 @@ class LLMUsageDatabaseService:
         finally:
             cursor.close()
 
-    def current_month_tokens_used(self) -> int:
+    def current_month_tokens_used(self, model: str) -> int:
         """Get the current month tokens used.
 
         Returns:
@@ -146,8 +147,8 @@ class LLMUsageDatabaseService:
             cursor = self.mysql_client.cursor(dictionary=True)
 
             cursor.execute(
-                "SELECT SUM(`tokens_used`) as `tokens_used` FROM `tokens_counter` WHERE `year` = %s AND `month` = %s",
-                (datetime.now().year, datetime.now().month),
+                "SELECT SUM(`tokens_used`) as `tokens_used` FROM `tokens_counter` WHERE `year` = %s AND `month` = %s AND (`crc_model` = CRC32(%s) AND `model` = %s)",
+                (datetime.now().year, datetime.now().month, model, model),
             )
 
             token_sum = int(cursor.fetchone()["tokens_used"])

@@ -28,7 +28,7 @@ class GoogleLLMService(LLMService):
 
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
-        return self.database.current_month_tokens_used()
+        return self.database.current_month_tokens_used(f"google/{self.model}")
 
     def count_tokens(
         self,
@@ -111,7 +111,9 @@ class GoogleLLMService(LLMService):
         if response is None:
             return None
 
-        self.database.insert_token_usage(response.usage_metadata.total_token_count)
+        self.database.insert_token_usage(
+            response.usage_metadata.total_token_count, f"google/{self.model}"
+        )
         return CommitMessage.model_validate_json(response.text)
 
     def supports(self, action: LLMAction) -> bool:
