@@ -269,6 +269,7 @@ $RECYCLE.BIN/
 *.lnk
 *.code-workspace
 debugger.py
+debug.py
 *.db
 
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,dotenv,windows,visualstudiocode,python
