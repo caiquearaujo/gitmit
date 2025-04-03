@@ -1,6 +1,8 @@
 import requests
 import shutil
 import sys
+import os
+import uuid
 
 from pydantic import BaseModel
 from rich.progress import Progress
@@ -35,12 +37,13 @@ class UpdateTool:
             return
 
         asset_url = f"https://github.com/{self.repo}/releases/download/{latest_version}/gitmit-{latest_version}.pex"
-        temp_path = "/tmp/gitmit.pex"
+        temp_path = f"/tmp/gitmit-{uuid.uuid4()}.pex"
 
         self.__download(asset_url, temp_path)
 
         try:
             shutil.copy(temp_path, sys.argv[0])
+            os.chmod(sys.argv[0], 0o755)
             display_success("Update successful!")
         except Exception as e:
             display_error(f"Error updating the file: {e}")
