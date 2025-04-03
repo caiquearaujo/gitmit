@@ -18,7 +18,7 @@ class UpdateTool:
         self.version = version
         self.repo = repo
 
-    def run(self):
+    def run(self, force: bool = False):
         """Run the update tool."""
         response = requests.get(
             f"https://api.github.com/repos/{self.repo}/releases/latest"
@@ -32,7 +32,7 @@ class UpdateTool:
         latest_version = release_info.get("tag_name")
         current_version = self.version
 
-        if latest_version == current_version:
+        if latest_version == current_version and not force:
             display_success("You are already on the latest version.")
             return
 
