@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitmit"
+version = "0.0.1"
+description = "Gitmit is a tool that helps you to manage your git repositories."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "GitPython==3.1.44",
+    "google-genai==1.9.0",
+    "mysql-connector-python==9.2.0",
+    "ollama==0.4.7",
+    "requests==2.32.3",
+    "rich==14.0.0",
+]
+authors = [
+    { name = "Caique Araujo", email = "caique@piggly.com.br" }
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,9 +1,10 @@
 """Commit message."""
 
 from pydantic import BaseModel
-from src.services.git import GitService
-from src.services.config import Services
-from src.utils.terminal import Panel, display_info
+
+from ..services.git import GitService
+from ..services.config import Services
+from ..utils.terminal import Panel, display_info
 
 
 class InitSettings(BaseModel):

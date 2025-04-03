@@ -6,10 +6,10 @@ from git import Repo
 from google import genai
 from google.genai import types as genai_types
 
-from src.llms import LLMService, LLMAction
-from src.resources.types import CommitMessage
-from src.services.database import LLMUsageDatabaseService
-from src.resources import llms
+from . import LLMService, LLMAction
+from ..resources.types import CommitMessage
+from ..services.database import LLMUsageDatabaseService
+from ..resources import llms
 
 
 class GoogleLLMService(LLMService):

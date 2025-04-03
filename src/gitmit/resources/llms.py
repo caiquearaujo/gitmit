@@ -4,8 +4,8 @@ from typing import Optional
 
 import git
 
-from src.resources.types import get_commit_types_resume
-from src.resources.files import load_all
+from .types import get_commit_types_resume
+from .files import load_all
 
 
 def prompt_resume_changes(repo: git.Repo, explanation: str = None) -> Optional[str]:

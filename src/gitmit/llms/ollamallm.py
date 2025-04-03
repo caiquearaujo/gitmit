@@ -5,10 +5,10 @@ from typing import Optional
 from ollama import Client
 from git import Repo
 
-from src.llms import LLMService, LLMAction
-from src.resources.types import CommitMessage
+from . import LLMService, LLMAction
+from ..resources.types import CommitMessage
 
-from src.resources import llms
+from ..resources import llms
 
 
 class OllamaLLMService(LLMService):

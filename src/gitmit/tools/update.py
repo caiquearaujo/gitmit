@@ -4,7 +4,8 @@ import sys
 
 from pydantic import BaseModel
 from rich.progress import Progress
-from src.utils.terminal import display_error, display_success
+
+from ..utils.terminal import display_error, display_success
 
 
 class UpdateTool:
@@ -33,8 +34,8 @@ class UpdateTool:
             display_success("You are already on the latest version.")
             return
 
-        asset_url = f"https://github.com/{self.repo}/releases/download/{latest_version}/gitmit-{latest_version}.pyz"
-        temp_path = "/tmp/gitmit.pyz"
+        asset_url = f"https://github.com/{self.repo}/releases/download/{latest_version}/gitmit-{latest_version}.pex"
+        temp_path = "/tmp/gitmit.pex"
 
         self.__download(asset_url, temp_path)
 

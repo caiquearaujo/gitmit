@@ -1,20 +1,20 @@
 import signal
 import sys
 
-from src.gitmit.services.config import init
-from src.gitmit.services.git import GitService
-from src.gitmit.tools.commit import CommitTool, CommitSettings
-from src.gitmit.tools.init import InitTool, InitSettings
-from src.gitmit.tools.update import UpdateTool
-from src.gitmit.utils.args import parse_args
-from src.gitmit.utils.terminal import (
+from .services.config import init
+from .services.git import GitService
+from .tools.commit import CommitTool, CommitSettings
+from .tools.init import InitTool, InitSettings
+from .tools.update import UpdateTool
+from .utils.args import parse_args
+from .utils.terminal import (
     display_success,
     display_error,
     display_info,
     Panel,
 )
 
-__VERSION__ = "0.1.0"
+__VERSION__ = "0.0.1"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 
@@ -97,7 +97,3 @@ def main():
     finally:
         close_all()
         display_success("Bye, bye 🖖")
-
-
-if __name__ == "__main__":
-    main()
