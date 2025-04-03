@@ -1,6 +1,6 @@
 # Gitmit
 
-![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](LICENSE)
+![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.1.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
 
 ![Gitmit Preview](./gitmit-preview.png)
 
@@ -66,7 +66,7 @@ The main goal for this feature is keeping track the token usage across different
    ```
 5. Move the file to `/usr/local/bin/gitmit`:
    ```bash
-	mv /tmp/gitmit/gitmit-x.x.x.pyz /usr/local/bin/gitmit
+	mv /tmp/gitmit/gitmit-x.x.x.pex /usr/local/bin/gitmit
    ```
 6. Make the file executable:
    ```bash

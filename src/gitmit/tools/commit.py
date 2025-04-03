@@ -2,16 +2,17 @@
 
 from datetime import datetime
 from pydantic import BaseModel
-from src.llms import LLMAction
-from src.resources.types import (
+
+from ..llms import LLMAction
+from ..resources.types import (
     CommitType,
     CommitMessage,
     CommitTypeProps,
     get_commit_types,
 )
-from src.services.git import GitService
-from src.services.config import Services
-from src.utils.terminal import (
+from ..services.git import GitService
+from ..services.config import Services
+from ..utils.terminal import (
     display_error,
     display_warning,
     display_info,

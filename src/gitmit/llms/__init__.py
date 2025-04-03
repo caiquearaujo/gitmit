@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from git import Repo
 
-from src.resources.types import CommitMessage
+from ..resources.types import CommitMessage
 
 
 class LLMAction(Enum):

@@ -1,0 +1,5 @@
+recursive-exclude __pycache__ *
+recursive-exclude .venv *
+recursive-exclude .vscode *
+recursive-exclude build *
+recursive-exclude dist *

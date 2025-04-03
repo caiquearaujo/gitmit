@@ -8,10 +8,10 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from src.services.database import ConnectionModel, LLMUsageDatabaseService
-from src.llms.ollamallm import OllamaLLMService
-from src.llms.googlellm import GoogleLLMService
-from src.llms import LLMService
+from ..services.database import ConnectionModel, LLMUsageDatabaseService
+from ..llms.ollamallm import OllamaLLMService
+from ..llms.googlellm import GoogleLLMService
+from ..llms import LLMService
 
 
 class Services(BaseModel):

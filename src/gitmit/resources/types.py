@@ -1,6 +1,5 @@
 """Types for the project."""
 
-import json
 from enum import Enum
 
 from pydantic import BaseModel

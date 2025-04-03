@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from pathlib import Path
 from datetime import datetime, timedelta
 
-from src.utils.terminal import display_error
+from ..utils.terminal import display_error
 
 
 class ConnectionModel(BaseModel):

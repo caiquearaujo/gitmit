@@ -17,6 +17,7 @@ mdurl==0.1.2
 mysql-connector-python==9.2.0
 ollama==0.4.7
 packaging==24.2
+pex==2.33.7
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.11.1
