@@ -1,5 +1,6 @@
 import signal
 import sys
+
 from src.services.config import init
 from src.services.git import GitService
 from src.tools.commit import CommitTool, CommitSettings
@@ -7,7 +8,6 @@ from src.tools.init import InitTool, InitSettings
 from src.tools.update import UpdateTool
 from src.utils.args import parse_args
 from src.utils.terminal import display_success, display_error, display_info, Panel
-from src.resources.types import get_commit_types_resume
 
 __VERSION__ = "0.1.0"
 __REPO__ = "caiquearaujo/gitmit"
