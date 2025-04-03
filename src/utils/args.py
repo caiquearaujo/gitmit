@@ -1,6 +1,9 @@
 import argparse
 import os
 import pathlib
+import re
+
+from urllib.parse import urlparse
 
 
 class CheckPathAction(argparse.Action):
@@ -13,6 +16,25 @@ class CheckPathAction(argparse.Action):
             parser.error(f"The specified path '{path}' does not exist.")
 
         setattr(namespace, self.dest, path)
+
+
+class CheckOriginAction(argparse.Action):
+    def __is_git_ssh(self, url: str) -> bool:
+        return re.match(r"^[\w\.-]+@[\w\.-]+:[\w\./-]+\.git$", url) is not None
+
+    def __is_url(self, url: str) -> bool:
+        try:
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if self.__is_git_ssh(values) or self.__is_url(values):
+            setattr(namespace, self.dest, values)
+            return
+
+        parser.error("The origin URL is not valid.")
 
 
 def __commit_parser(subparsers: argparse._SubParsersAction):
@@ -28,6 +50,25 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         "--force",
         help="Once you use this option, you will not be asked for confirmation before committing.",
         action="store_true",
+    )
+
+    return parser
+
+
+def __init_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("init", help="Initialize the project.")
+
+    parser.add_argument(
+        "--dev",
+        help="Create a dev branch.",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "--origin",
+        help="Set the origin URL.",
+        type=str,
+        action=CheckOriginAction,
     )
 
     return parser
@@ -52,6 +93,6 @@ def parse_args():
     subparsers = parser.add_subparsers(dest="command", help="Command to be executed.")
 
     __commit_parser(subparsers)
-    subparsers.add_parser("init", help="Initialize the project.")
+    __init_parser(subparsers)
 
     return parser.parse_args()

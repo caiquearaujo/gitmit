@@ -3,6 +3,7 @@ import sys
 from src.services.config import init
 from src.services.git import GitService
 from src.tools.commit import CommitTool, CommitSettings
+from src.tools.init import InitTool, InitSettings
 from src.utils.args import parse_args
 from src.utils.terminal import display_success, display_error, display_warning, Panel
 
@@ -31,7 +32,11 @@ def main(args):
             services=config,
             settings=CommitSettings(push=args.push, force=args.force),
         ).run(),
-        # "init": lambda: InitTool(service, services=config).run(),
+        "init": lambda: InitTool(
+            service,
+            services=config,
+            settings=InitSettings(dev=args.dev, origin=args.origin),
+        ).run(),
     }
 
     func = switcher.get(args.command, False)
