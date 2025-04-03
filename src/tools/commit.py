@@ -1,7 +1,7 @@
 """Commit message."""
 
 from datetime import datetime
-
+from pydantic import BaseModel
 from src.llms import LLMAction
 from src.resources.types import (
     CommitType,
@@ -23,10 +23,17 @@ from src.utils.terminal import (
 )
 
 
+class CommitSettings(BaseModel):
+    push: bool = False
+    force: bool = False
+
+
 class CommitTool:
     """Commit tool."""
 
-    def __init__(self, git_service: GitService, services: Services):
+    def __init__(
+        self, git_service: GitService, services: Services, settings: CommitSettings
+    ):
         """Initialize the commit tool."""
 
         if not git_service.exists():
@@ -34,6 +41,7 @@ class CommitTool:
 
         self.git_service = git_service
         self.services = services
+        self.settings = settings
 
     def run(self):
         """Run the commit tool."""
@@ -71,51 +79,20 @@ class CommitTool:
             )
         )
 
-        keep = ask_confirmation(
-            "Ready to commit?",
-            default="y",
-            clean=False,
-        )
+        if not self.settings.force:
+            keep = ask_confirmation(
+                "Ready to commit?",
+                default="y",
+                clean=False,
+            )
 
-        if not keep:
-            return
+            if not keep:
+                return
 
         self.git_service.commit(message)
 
-        push = ask_confirmation(
-            "Do you want to push this commit to remote?",
-            default="y",
-            clean=False,
-        )
-
-        if push:
-            origin_name = "origin"
-            keep_trying = True
-
-            if self.git_service.remoteExists(origin_name) is False:
-                while True:
-                    origin_name = ask(
-                        "Set a remote name (origin not found)",
-                        required=True,
-                        clean=False,
-                    )
-
-                    if self.git_service.remoteExists(origin_name) is False:
-                        display_error(
-                            "Cannot find any remote with name: " + origin_name,
-                        )
-
-                        origin_name = None
-                        keep_trying = ask_confirmation(
-                            "Do you want to try a new remote name?",
-                            default="y",
-                            clean=False,
-                        )
-
-                        if not keep_trying:
-                            return
-
-            self.git_service.pushTo(branch, origin_name)
+        if self.settings.push:
+            self.__push_to_remote(branch)
 
     def __llm_commit(self):
         """Commit using LLM."""
@@ -270,3 +247,33 @@ class CommitTool:
         )
 
         return message
+
+    def __push_to_remote(self, branch: str):
+        """Push to remote."""
+        origin_name = "origin"
+        keep_trying = True
+
+        if self.git_service.remoteExists(origin_name) is False:
+            while True:
+                origin_name = ask(
+                    "Set a remote name (origin not found)",
+                    required=True,
+                    clean=False,
+                )
+
+                if self.git_service.remoteExists(origin_name) is False:
+                    display_error(
+                        "Cannot find any remote with name: " + origin_name,
+                    )
+
+                    origin_name = None
+                    keep_trying = ask_confirmation(
+                        "Do you want to try a new remote name?",
+                        default="y",
+                        clean=False,
+                    )
+
+                    if not keep_trying:
+                        return
+
+        self.git_service.pushTo(branch, origin_name)

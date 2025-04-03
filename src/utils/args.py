@@ -15,6 +15,24 @@ class CheckPathAction(argparse.Action):
         setattr(namespace, self.dest, path)
 
 
+def __commit_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("commit", help="Commit all changes.")
+
+    parser.add_argument(
+        "--push",
+        help="Automatically push the changes to the remote repository.",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "--force",
+        help="Once you use this option, you will not be asked for confirmation before committing.",
+        action="store_true",
+    )
+
+    return parser
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="GitMit",
@@ -33,7 +51,7 @@ def parse_args():
 
     subparsers = parser.add_subparsers(dest="command", help="Command to be executed.")
 
-    subparsers.add_parser("commit", help="Commit all changes.")
+    __commit_parser(subparsers)
     subparsers.add_parser("init", help="Initialize the project.")
 
     return parser.parse_args()

@@ -2,7 +2,7 @@ import signal
 import sys
 from src.services.config import init
 from src.services.git import GitService
-from src.tools.commit import CommitTool
+from src.tools.commit import CommitTool, CommitSettings
 from src.utils.args import parse_args
 from src.utils.terminal import display_success, display_error, display_warning, Panel
 
@@ -26,7 +26,11 @@ def main(args):
     service = GitService(args.path)
 
     switcher = {
-        "commit": lambda: CommitTool(service, services=config).run(),
+        "commit": lambda: CommitTool(
+            service,
+            services=config,
+            settings=CommitSettings(push=args.push, force=args.force),
+        ).run(),
         # "init": lambda: InitTool(service, services=config).run(),
     }
 
