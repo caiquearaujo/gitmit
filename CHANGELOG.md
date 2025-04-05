@@ -4,3 +4,7 @@
 
 - Initial release. See [README.md](README.md) for installation instructions.
 
+## v0.2.0 at 2025-04-05
+
+- [Change] Better "meaning" explanation for commit types;
+- [Change] Prompt improvements.

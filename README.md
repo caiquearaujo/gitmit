@@ -1,6 +1,6 @@
 # Gitmit
 
-![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.1.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.2.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
 
 ![Gitmit Preview](./gitmit-preview.png)
 
@@ -176,7 +176,7 @@ When committing, you'll be presented with two options:
 It will be used to update the tool to the latest version. Only supported to the official repository.
 
 ```bash
-gitmit update 
+gitmit update
 ```
 
 Example:
