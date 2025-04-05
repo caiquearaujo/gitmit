@@ -9,15 +9,14 @@ class CommitType(Enum):
     """The type of commit."""
 
     FEAT = "feat"
-    IMPROVEMENT = "improvement"
-    FIX = "fix"
-    BUG = "bug"
-    LINT = "lint"
+    BUGFIX = "bugfix"
     DOCS = "docs"
     STYLE = "style"
     REFACTOR = "refactor"
     PERF = "perf"
+    ENHANCEMENT = "enhancement"
     TEST = "test"
+    LINT = "lint"
     BUILD = "build"
     CI = "ci"
     CHORE = "chore"
@@ -28,7 +27,7 @@ class CommitType(Enum):
     METADATA = "metadata"
     VERSION = "version"
     SECURITY = "security"
-    CRITICAL = "critical"
+    HOTFIX = "hotfix"
     REVIEW = "review"
     OTHER = "other"
 
@@ -63,161 +62,154 @@ def get_commit_types() -> list[CommitTypeProps]:
             commit_emoji=":sparkles:",
             preview_emoji="✨",
             commit_type=CommitType.FEAT,
-            commit_meaning="Useful when adding new features. Should be used carefully, for context a feature means a new class, function, component, etc.",
+            commit_meaning="Use this when introducing a new feature that changes or adds functionality from the user's perspective.",
             commit_title="Feature",
-        ),
-        CommitTypeProps(
-            commit_emoji=":adhesive_bandage:",
-            preview_emoji="🩹",
-            commit_type=CommitType.FIX,
-            commit_meaning="Useful when overall fixes, not a new feature or something else.",
-            commit_title="Fix",
         ),
         CommitTypeProps(
             commit_emoji=":bug:",
             preview_emoji="🐞",
-            commit_type=CommitType.BUG,
-            commit_meaning="Useful when fixing bugs.",
-            commit_title="Bug",
+            commit_type=CommitType.BUGFIX,
+            commit_meaning="Use this when fixing an issue or bug. This typically addresses flaws in logic or unintended behavior.",
+            commit_title="Bugfix",
         ),
         CommitTypeProps(
             commit_emoji=":books:",
             preview_emoji="📚",
             commit_type=CommitType.DOCS,
-            commit_meaning="Useful when adding documentation, editing markdowns, etc.",
+            commit_meaning="Use this when adding or improving documentation (e.g., README, comments, or any form of project documentation).",
             commit_title="Documentation",
         ),
         CommitTypeProps(
             commit_emoji=":gem:",
             preview_emoji="💎",
             commit_type=CommitType.STYLE,
-            commit_meaning="Useful when styling the code, styling the frontend, etc.",
+            commit_meaning="Use this when making purely stylistic changes that do not affect code behavior (formatting, indentation, etc.).",
             commit_title="Style",
         ),
         CommitTypeProps(
             commit_emoji=":package:",
             preview_emoji="📦",
             commit_type=CommitType.REFACTOR,
-            commit_meaning="Useful when refactoring the code, changing the code structure, etc.",
+            commit_meaning="Use this when restructuring or reorganizing the code without altering its external behavior.",
             commit_title="Refactor",
         ),
         CommitTypeProps(
             commit_emoji=":racehorse:",
             preview_emoji="🐎",
             commit_type=CommitType.PERF,
-            commit_meaning="Useful when improving the performance of the code.",
+            commit_meaning="Use this when improving performance, optimizing code, or reducing resource usage.",
             commit_title="Performance",
         ),
         CommitTypeProps(
             commit_emoji=":recycle:",
-            preview_emoji="♻️ ",
-            commit_type=CommitType.IMPROVEMENT,
-            commit_meaning="Useful when improving the code, not a new feature or something else.",
-            commit_title="Improvements",
+            preview_emoji="♻️",
+            commit_type=CommitType.ENHANCEMENT,
+            commit_meaning="Use this when making minor improvements to existing functionality that are not fixes or new features.",
+            commit_title="Enhancement",
         ),
         CommitTypeProps(
             commit_emoji=":white_check_mark:",
             preview_emoji="✅",
             commit_type=CommitType.TEST,
-            commit_meaning="Useful when writing tests.",
+            commit_meaning="Use this when adding or updating tests.",
             commit_title="Test",
         ),
         CommitTypeProps(
             commit_emoji=":rotating_light:",
             preview_emoji="🚨",
             commit_type=CommitType.LINT,
-            commit_meaning="Useful when fixing compiler / linter warnings.",
+            commit_meaning="Use this when fixing or adjusting linter, compiler warnings, or related code-quality checks.",
             commit_title="Lint",
         ),
         CommitTypeProps(
             commit_emoji=":wrench:",
             preview_emoji="🔧",
             commit_type=CommitType.BUILD,
-            commit_meaning="Useful when building the code.",
+            commit_meaning="Use this when making changes to the build process or external dependencies that affect the build system.",
             commit_title="Build",
         ),
         CommitTypeProps(
             commit_emoji=":gear:",
-            preview_emoji="⚙️ ",
+            preview_emoji="⚙️",
             commit_type=CommitType.CI,
-            commit_meaning="Useful when setting up the continuous integration.",
+            commit_meaning="Use this when modifying CI configuration or scripts (e.g., GitHub Actions, Jenkins, CircleCI).",
             commit_title="CI",
         ),
         CommitTypeProps(
             commit_emoji=":recycle:",
-            preview_emoji="♻️ ",
+            preview_emoji="♻️",
             commit_type=CommitType.CHORE,
-            commit_meaning="Useful when doing chores, like cleaning the code, etc.",
+            commit_meaning="Use this when performing general maintenance tasks that do not affect source or test files directly (e.g., package updates, minor config changes).",
             commit_title="Chore",
         ),
         CommitTypeProps(
             commit_emoji=":rewind:",
             preview_emoji="⏪",
             commit_type=CommitType.REVERT,
-            commit_meaning="Useful when reverting a commit.",
+            commit_meaning="Use this when reverting a previous commit.",
             commit_title="Revert",
         ),
         CommitTypeProps(
             commit_emoji=":arrow_double_up:",
             preview_emoji="⏫",
             commit_type=CommitType.DEPENDENCIES,
-            commit_meaning="Useful when updating the dependencies.",
+            commit_meaning="Use this when updating or modifying production dependencies.",
             commit_title="Dependencies",
         ),
         CommitTypeProps(
             commit_emoji=":arrow_double_up:",
             preview_emoji="⏫",
             commit_type=CommitType.PEER_DEPENDENCIES,
-            commit_meaning="Useful when updating the peer dependencies.",
+            commit_meaning="Use this when updating or changing peer dependencies (often relevant for libraries/plugins).",
             commit_title="Peer Dependencies",
         ),
         CommitTypeProps(
             commit_emoji=":arrow_double_up:",
             preview_emoji="⏫",
             commit_type=CommitType.DEV_DEPENDENCIES,
-            commit_meaning="Useful when updating the dev dependencies.",
+            commit_meaning="Use this when updating or modifying development dependencies (testing, linting, building, etc.).",
             commit_title="Dev Dependencies",
         ),
         CommitTypeProps(
             commit_emoji=":card_index:",
             preview_emoji="📇",
             commit_type=CommitType.METADATA,
-            commit_meaning="Useful when updating the metadata.",
+            commit_meaning="Use this when updating metadata like project settings, documentation metadata, or repository information.",
             commit_title="Metadata",
         ),
         CommitTypeProps(
             commit_emoji=":bookmark:",
             preview_emoji="🔖",
             commit_type=CommitType.VERSION,
-            commit_meaning="Useful when updating the version.",
+            commit_meaning="Use this when bumping or modifying version numbers.",
             commit_title="Version",
         ),
         CommitTypeProps(
             commit_emoji=":lock:",
             preview_emoji="🔒",
             commit_type=CommitType.SECURITY,
-            commit_meaning="Useful when updating the security issues.",
+            commit_meaning="Use this when addressing security vulnerabilities or implementing security-related fixes.",
             commit_title="Security",
         ),
         CommitTypeProps(
             commit_emoji=":ambulance:",
             preview_emoji="🚑",
-            commit_type=CommitType.CRITICAL,
-            commit_meaning="Useful when updating the critical changes that may break the code.",
-            commit_title="Critical",
+            commit_type=CommitType.HOTFIX,
+            commit_meaning="Use this for urgent or high-priority fixes addressing critical issues in production.",
+            commit_title="Hotfix",
         ),
         CommitTypeProps(
             commit_emoji=":ok_hand:",
             preview_emoji="👌",
             commit_type=CommitType.REVIEW,
-            commit_meaning="Useful when reviewing the code.",
+            commit_meaning="Use this when reviewing code, merging PRs, or making changes based on code reviews.",
             commit_title="Review",
         ),
         CommitTypeProps(
             commit_emoji=":bricks:",
             preview_emoji="🧱",
             commit_type=CommitType.OTHER,
-            commit_meaning="Useful when doing other things not related to the other commit types.",
+            commit_meaning="Use this for any commit that does not fit into the other categories.",
             commit_title="Other",
         ),
     ]
