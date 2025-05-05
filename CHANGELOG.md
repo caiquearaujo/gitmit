@@ -8,3 +8,7 @@
 
 - [Change] Better "meaning" explanation for commit types;
 - [Change] Prompt improvements.
+
+## v0.2.1 at 2025-05-05
+
+- [Fix] Parsing month for MySQL usage tracking.

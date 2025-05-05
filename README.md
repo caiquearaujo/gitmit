@@ -1,6 +1,6 @@
 # Gitmit
 
-![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.2.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.2.1-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
 
 ![Gitmit Preview](./gitmit-preview.png)
 

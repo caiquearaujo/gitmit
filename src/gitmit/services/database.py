@@ -154,8 +154,12 @@ class LLMUsageDatabaseService:
                 (datetime.now().year, datetime.now().month, model, model),
             )
 
-            token_sum = int(cursor.fetchone()["tokens_used"])
-            return token_sum if token_sum is not None else 0
+            fetch = cursor.fetchone()
+
+            if fetch is None:
+                return 0
+
+            return int(fetch["tokens_used"] or 0)
         except Exception as e:
             display_error(
                 f"An error occurred while getting the current month tokens used: {e}"
