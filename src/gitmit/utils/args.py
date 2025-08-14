@@ -64,6 +64,23 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         action="store_true",
     )
 
+    parser.add_argument(
+        "-m",
+        "--mode",
+        help="Set the mode of the commit.",
+        type=str,
+        choices=["manual", "ai"],
+        default=None,
+    )
+
+    parser.add_argument(
+        "-b",
+        "--brief",
+        help="Type a brief summary of the changes.",
+        type=str,
+        default=None,
+    )
+
     return parser
 
 

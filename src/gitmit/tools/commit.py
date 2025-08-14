@@ -27,6 +27,8 @@ from ..utils.terminal import (
 class CommitSettings(BaseModel):
     push: bool = False
     force: bool = False
+    mode: str = None
+    brief: str = None
 
 
 class CommitTool:
@@ -52,12 +54,18 @@ class CommitTool:
             display_warning("No changes to commit.")
             return
 
-        mode = choose(
-            "Set your commit mode",
-            ["🤖 Generated", "🥵 Manual", "❌ Abort"],
-            default=1,
-            clean=False,
-        )
+        if self.settings.mode is None:
+            mode = choose(
+                "Set your commit mode",
+                ["🤖 Generated", "🥵 Manual", "❌ Abort"],
+                default=1,
+                clean=False,
+            )
+        else:
+            mode = {
+                "manual": 1,
+                "ai": 0,
+            }[self.settings.mode]
 
         if mode == 2:
             return
@@ -87,6 +95,11 @@ class CommitTool:
             )
 
             if not keep:
+                message = self.__manual_commit()
+
+                if message is None:
+                    return
+
                 return
 
         self.git_service.commit(message)
@@ -112,14 +125,15 @@ class CommitTool:
                 )
             )
 
-            keep = ask_confirmation(
-                "Do you want to continue?",
-                default="y",
-                clean=False,
-            )
+            if not self.settings.force:
+                keep = ask_confirmation(
+                    "Do you want to continue?",
+                    default="y",
+                    clean=False,
+                )
 
-            if not keep:
-                return self.__manual_commit()
+                if not keep:
+                    return self.__manual_commit()
 
         # @note second, estimate count usage for current prompt
         if self.services.commit.supports(LLMAction.COUNT_TOKENS):
@@ -137,24 +151,30 @@ class CommitTool:
                 )
             )
 
-            keep = ask_confirmation(
-                "Do you want to continue?",
-                default="y",
-                clean=False,
-            )
+            if not self.settings.force:
+                keep = ask_confirmation(
+                    "Do you want to continue?",
+                    default="y",
+                    clean=False,
+                )
 
-            if not keep:
-                return self.__manual_commit()
+                if not keep:
+                    return self.__manual_commit()
 
         # @note generate commit message
-        commit_message = self.services.commit.commit_message(
-            self.git_service.repo,
-            explanation=ask(
+        if self.settings.brief is None:
+            explanation = ask(
                 "[bold yellow]?[/bold yellow] May briefly explain your changes",
                 required=False,
                 default=None,
                 clean=False,
-            ),
+            )
+        else:
+            explanation = self.settings.brief
+
+        commit_message = self.services.commit.commit_message(
+            self.git_service.repo,
+            explanation=explanation,
             resume=self.services.resume,
         )
 
