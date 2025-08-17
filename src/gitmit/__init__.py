@@ -7,6 +7,7 @@ from .tools.commit import CommitTool, CommitSettings
 from .tools.init import InitTool, InitSettings
 from .tools.merge import MergeTool, MergeSettings
 from .tools.update import UpdateTool
+from .tools.versioning import VersioningTool, VersioningSettings
 from .utils.args import parse_args
 from .utils.terminal import (
     display_success,
@@ -76,6 +77,16 @@ def startup(args):
             ),
         ).run(),
         "update": lambda: UpdateTool(__VERSION__, __REPO__).run(args.force),
+        "versioning": lambda: VersioningTool(
+            service,
+            services=config,
+            settings=VersioningSettings(
+                version=args.version,
+                origin=args.origin,
+                force=args.force,
+                push=args.push,
+            ),
+        ).run(),
     }
 
     func = switcher.get(args.command, False)
