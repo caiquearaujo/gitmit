@@ -19,3 +19,8 @@
   - Add `--mode` option to auto set the commit mode: `manual` or `ai`;
   - Add `--brief` option to type a brief summary of the changes when using `ai` mode;
   - Add `--force` option to ignore all confirmations, including LLM confirmations.
+
+## v0.4.0 at 2025-08-17
+
+- [Add] Add `versioning` command;
+- [Add] Add `merge` command.

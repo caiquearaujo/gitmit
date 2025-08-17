@@ -115,6 +115,63 @@ def __update_parser(subparsers: argparse._SubParsersAction):
     return parser
 
 
+def __merge_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("merge", help="Merge branches following GitFlow.")
+
+    parser.add_argument(
+        "--origin",
+        help="Origin branch to merge from (default: dev).",
+        type=str,
+        default="dev",
+    )
+
+    parser.add_argument(
+        "--destination",
+        help="Destination branch to merge into (default: main).",
+        type=str,
+        default="main",
+    )
+
+    parser.add_argument(
+        "--push",
+        help="Push changes to remote after merge.",
+        action="store_true",
+    )
+
+    return parser
+
+
+def __versioning_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("versioning", help="Create and manage version tags.")
+
+    parser.add_argument(
+        "version",
+        help="Version to tag in SemVer format (e.g., 1.0.0, 2.1.3-beta).",
+        type=str,
+    )
+
+    parser.add_argument(
+        "--origin",
+        help="Origin branch to create tag from (default: main).",
+        type=str,
+        default="main",
+    )
+
+    parser.add_argument(
+        "--force",
+        help="Delete existing tag if it exists and recreate it.",
+        action="store_true",
+    )
+
+    parser.add_argument(
+        "--push",
+        help="Push tag to remote after creation.",
+        action="store_true",
+    )
+
+    return parser
+
+
 def parse_args(version: str):
     parser = argparse.ArgumentParser(
         prog="GitMit",
@@ -144,5 +201,7 @@ def parse_args(version: str):
     subparsers.add_parser("config", help="Creates the configuration file.")
     __commit_parser(subparsers)
     __init_parser(subparsers)
+    __merge_parser(subparsers)
     __update_parser(subparsers)
+    __versioning_parser(subparsers)
     return parser.parse_args()

@@ -129,6 +129,90 @@ class GitService:
         """
         return self.git.status("--porcelain") != ""
 
+    def checkout(self, branch: str):
+        """Checkout to a branch.
+
+        Args:
+            branch (str): The name of the branch to checkout.
+        """
+        self.git.checkout(branch)
+
+    def pull(self, remote: str = "origin", branch: str = None):
+        """Pull changes from the remote repository.
+
+        Args:
+            remote (str): The name of the remote (default: origin).
+            branch (str): The name of the branch to pull (default: current branch).
+
+        Returns:
+            str: The output from the pull command.
+        """
+        if branch:
+            return self.git.pull(remote, branch)
+
+        return self.git.pull(remote)
+
+    def merge(self, branch: str):
+        """Merge a branch into the current branch.
+
+        Args:
+            branch (str): The name of the branch to merge.
+        """
+        self.git.merge(branch, "--no-ff")
+
+    def tagExists(self, tag_name: str) -> bool:
+        """Check if a tag exists.
+
+        Args:
+            tag_name (str): The name of the tag.
+
+        Returns:
+            bool: True if tag exists, False otherwise.
+        """
+        try:
+            self.git.rev_parse(tag_name)
+            return True
+        except:
+            return False
+
+    def createTag(self, tag_name: str, message: str = None):
+        """Create a new tag.
+
+        Args:
+            tag_name (str): The name of the tag.
+            message (str): Optional message for annotated tag.
+        """
+        if message:
+            self.git.tag("-a", tag_name, "-m", message)
+        else:
+            self.git.tag(tag_name)
+
+    def deleteTag(self, tag_name: str):
+        """Delete a local tag.
+
+        Args:
+            tag_name (str): The name of the tag to delete.
+        """
+        self.git.tag("-d", tag_name)
+
+    def deleteRemoteTag(self, tag_name: str, remote: str = "origin"):
+        """Delete a remote tag.
+
+        Args:
+            tag_name (str): The name of the tag to delete.
+            remote (str): The name of the remote (default: origin).
+        """
+        self.git.push(remote, "--delete", f":refs/tags/{tag_name}")
+
+    def pushTag(self, tag_name: str, remote: str = "origin"):
+        """Push a tag to remote.
+
+        Args:
+            tag_name (str): The name of the tag to push.
+            remote (str): The name of the remote (default: origin).
+        """
+        self.git.push(remote, tag_name)
+
     @staticmethod
     def buildRepo(target):
         """Build the Git repository.

@@ -5,7 +5,9 @@ from .services.config import init
 from .services.git import GitService
 from .tools.commit import CommitTool, CommitSettings
 from .tools.init import InitTool, InitSettings
+from .tools.merge import MergeTool, MergeSettings
 from .tools.update import UpdateTool
+from .tools.versioning import VersioningTool, VersioningSettings
 from .utils.args import parse_args
 from .utils.terminal import (
     display_success,
@@ -14,7 +16,7 @@ from .utils.terminal import (
     Panel,
 )
 
-__VERSION__ = "0.3.0"
+__VERSION__ = "0.4.0"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 
@@ -65,7 +67,26 @@ def startup(args):
             services=config,
             settings=InitSettings(dev=args.dev, origin=args.origin),
         ).run(),
+        "merge": lambda: MergeTool(
+            service,
+            services=config,
+            settings=MergeSettings(
+                origin=args.origin,
+                destination=args.destination,
+                push=args.push,
+            ),
+        ).run(),
         "update": lambda: UpdateTool(__VERSION__, __REPO__).run(args.force),
+        "versioning": lambda: VersioningTool(
+            service,
+            services=config,
+            settings=VersioningSettings(
+                version=args.version,
+                origin=args.origin,
+                force=args.force,
+                push=args.push,
+            ),
+        ).run(),
     }
 
     func = switcher.get(args.command, False)
