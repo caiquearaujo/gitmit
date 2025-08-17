@@ -5,6 +5,7 @@ from .services.config import init
 from .services.git import GitService
 from .tools.commit import CommitTool, CommitSettings
 from .tools.init import InitTool, InitSettings
+from .tools.merge import MergeTool, MergeSettings
 from .tools.update import UpdateTool
 from .utils.args import parse_args
 from .utils.terminal import (
@@ -64,6 +65,15 @@ def startup(args):
             service,
             services=config,
             settings=InitSettings(dev=args.dev, origin=args.origin),
+        ).run(),
+        "merge": lambda: MergeTool(
+            service,
+            services=config,
+            settings=MergeSettings(
+                origin=args.origin,
+                destination=args.destination,
+                push=args.push,
+            ),
         ).run(),
         "update": lambda: UpdateTool(__VERSION__, __REPO__).run(args.force),
     }

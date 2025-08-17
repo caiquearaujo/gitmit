@@ -129,6 +129,37 @@ class GitService:
         """
         return self.git.status("--porcelain") != ""
 
+    def checkout(self, branch: str):
+        """Checkout to a branch.
+
+        Args:
+            branch (str): The name of the branch to checkout.
+        """
+        self.git.checkout(branch)
+
+    def pull(self, remote: str = "origin", branch: str = None):
+        """Pull changes from the remote repository.
+
+        Args:
+            remote (str): The name of the remote (default: origin).
+            branch (str): The name of the branch to pull (default: current branch).
+
+        Returns:
+            str: The output from the pull command.
+        """
+        if branch:
+            return self.git.pull(remote, branch)
+
+        return self.git.pull(remote)
+
+    def merge(self, branch: str):
+        """Merge a branch into the current branch.
+
+        Args:
+            branch (str): The name of the branch to merge.
+        """
+        self.git.merge(branch, "--no-ff")
+
     @staticmethod
     def buildRepo(target):
         """Build the Git repository.

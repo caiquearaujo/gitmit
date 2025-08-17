@@ -115,6 +115,32 @@ def __update_parser(subparsers: argparse._SubParsersAction):
     return parser
 
 
+def __merge_parser(subparsers: argparse._SubParsersAction):
+    parser = subparsers.add_parser("merge", help="Merge branches following GitFlow.")
+
+    parser.add_argument(
+        "--origin",
+        help="Origin branch to merge from (default: dev).",
+        type=str,
+        default="dev",
+    )
+
+    parser.add_argument(
+        "--destination",
+        help="Destination branch to merge into (default: main).",
+        type=str,
+        default="main",
+    )
+
+    parser.add_argument(
+        "--push",
+        help="Push changes to remote after merge.",
+        action="store_true",
+    )
+
+    return parser
+
+
 def parse_args(version: str):
     parser = argparse.ArgumentParser(
         prog="GitMit",
@@ -144,5 +170,6 @@ def parse_args(version: str):
     subparsers.add_parser("config", help="Creates the configuration file.")
     __commit_parser(subparsers)
     __init_parser(subparsers)
+    __merge_parser(subparsers)
     __update_parser(subparsers)
     return parser.parse_args()
