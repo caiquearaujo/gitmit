@@ -17,7 +17,7 @@ from .utils.terminal import (
     Panel,
 )
 
-__VERSION__ = "0.4.0"
+__VERSION__ = "0.5.0"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 

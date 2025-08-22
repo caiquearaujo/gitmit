@@ -1,6 +1,6 @@
 # Gitmit
 
-![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.4.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.5.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
 
 ![Gitmit Preview](./gitmit-preview.png)
 
@@ -40,8 +40,9 @@ The main goal for this feature is keeping track the token usage across different
 1. Download the latest release file from the [GitHub releases page](https://github.com/caiquearaujo/gitmit/releases);
 2. Move the downloaded file to `/usr/local/bin/gitmit` or any other directory you want;
 3. Make the file executable:
+
    ```bash
-	# You may need to use sudo to make the file executable
+   # You may need to use sudo to make the file executable
    chmod +x /usr/local/bin/gitmit
    ```
 
@@ -50,32 +51,43 @@ The main goal for this feature is keeping track the token usage across different
 ### From Source
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/caiquearaujo/gitmit.git
    cd gitmit
    ```
+
 2. Create and activate a virtual environment:
+
    ```bash
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
+
 3. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
+
 4. Build the executable:
+
    ```bash
-	python build.py
+   python build.py
    ```
+
 5. Move the file to `/usr/local/bin/gitmit` or any other directory you want:
+
    ```bash
-	# You may need to use sudo to move the file to the bin directory
-	mv /tmp/gitmit/gitmit-x.x.x.pex /usr/local/bin/gitmit
+   # You may need to use sudo to move the file to the bin directory
+   mv /tmp/gitmit/gitmit-x.x.x.pex /usr/local/bin/gitmit
    ```
+
 6. Make the file executable:
+
    ```bash
-	# You may need to use sudo to make the file executable
-	chmod +x /usr/local/bin/gitmit
+   # You may need to use sudo to make the file executable
+   chmod +x /usr/local/bin/gitmit
    ```
 
 > When you set another bin directory, you need to update the `PATH` environment variable to include the new directory.
@@ -83,9 +95,11 @@ The main goal for this feature is keeping track the token usage across different
 ## Configuration
 
 1. Run the config command to generate the configuration file:
+
    ```bash
    gitmit config
    ```
+
 2. The configuration file will be created at `~/.config/gitmit/config.ini`. Edit it with your preferred text editor.
 
 > The configuration file will be written with `600` permissions, so it will be readable only by the current user.
@@ -93,6 +107,7 @@ The main goal for this feature is keeping track the token usage across different
 ### Configuration Options
 
 #### Models Section
+
 ```ini
 [models]
 # Required: The model to use for commit message generation
@@ -107,6 +122,7 @@ resume = ollama/codellama
 > The available LLM services are: `google` and `ollama`. You can use any model supported by services, make sure to use the correct model name.
 
 #### Google Section
+
 ```ini
 [google]
 # Required if using Google models: Your Google API key
@@ -114,6 +130,7 @@ api_key = your-api-key-here
 ```
 
 #### Ollama Section
+
 ```ini
 [ollama]
 # Required if using Ollama models: The Ollama server URL
@@ -121,6 +138,7 @@ host = http://localhost:11434
 ```
 
 #### MySQL Section
+
 ```ini
 [mysql]
 # Required: Database connection settings for token usage tracking
@@ -142,10 +160,12 @@ gitmit init [options]
 ```
 
 Options:
+
 - `--dev`: Create a dev branch (GitFlow);
 - `--origin`: Set the origin URL for the remote repository.
 
 Example:
+
 ```bash
 gitmit init --dev --origin https://github.com/username/repo.git
 ```
@@ -159,17 +179,20 @@ gitmit commit [options]
 ```
 
 Options:
+
 - `--push`: Automatically push changes to the remote repository;
 - `--force`: Skip confirmation before committing;
 - `-m, --mode`: Set the mode of the commit. Available options: `manual` or `ai`;
 - `-b, --brief`: Type a brief summary of the changes.
 
 Example:
+
 ```bash
 gitmit commit --push
 ```
 
 When committing, you'll be presented with two options:
+
 1. 🤖 Generated: AI will analyze your changes and generate an appropriate commit message;
 2. 🥵 Manual: You can manually create a commit message following the standardized format.
 
@@ -182,6 +205,7 @@ gitmit update
 ```
 
 Example:
+
 ```bash
 gitmit update
 ```
