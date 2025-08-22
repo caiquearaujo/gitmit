@@ -65,12 +65,18 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
     )
 
     parser.add_argument(
+        "--debug",
+        help="Display debug information, such as files that will be committed and current prompt.",
+        action="store_true",
+    )
+
+    parser.add_argument(
         "-m",
         "--mode",
         help="Set the mode of the commit.",
         type=str,
         choices=["manual", "ai"],
-        default=None,
+        default="ai",
     )
 
     parser.add_argument(
@@ -79,6 +85,12 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         help="Type a brief summary of the changes.",
         type=str,
         default=None,
+    )
+
+    parser.add_argument(
+        "--no-feat",
+        help="This option is useful when you want to commit changes that are not related to a new feature.",
+        action="store_true",
     )
 
     return parser
@@ -198,7 +210,9 @@ def parse_args(version: str):
 
     subparsers = parser.add_subparsers(dest="command", help="Command to be executed.")
 
-    subparsers.add_parser("config", help="Creates the configuration file.")
+    subparsers.add_parser(
+        "config", help="Display configuration and manage config file."
+    )
     __commit_parser(subparsers)
     __init_parser(subparsers)
     __merge_parser(subparsers)

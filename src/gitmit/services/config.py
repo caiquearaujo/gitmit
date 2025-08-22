@@ -21,6 +21,7 @@ class Services(BaseModel):
     resume: Optional[LLMService]
     database: LLMUsageDatabaseService
     path: str
+    file_created: bool = False
 
     class Config:
         arbitrary_types_allowed = True
@@ -59,7 +60,7 @@ def __parse_model(model: str, allow_none=False) -> Optional[dict[str, str]]:
     return {"service": parts[0], "model": parts[1]}
 
 
-def __evaluate(config: configparser.ConfigParser, path: str):
+def __evaluate(config: configparser.ConfigParser, path: str, file_created: bool = False):
     """Evaluate the config.
 
     Args:
@@ -126,6 +127,7 @@ def __evaluate(config: configparser.ConfigParser, path: str):
         ),
         database=database,
         path=path,
+        file_created=file_created,
     )
 
 
@@ -140,13 +142,15 @@ def init():
     file = path.joinpath("config.ini").as_posix()
 
     config = configparser.ConfigParser()
+    file_created = False
 
     if not Path(file).exists():
         __create(config, file)
+        file_created = True
     else:
         __read(config, file)
 
-    return __evaluate(config, file)
+    return __evaluate(config, file, file_created)
 
 
 def __read(config: configparser.ConfigParser, file: str):

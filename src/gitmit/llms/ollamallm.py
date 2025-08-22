@@ -39,7 +39,9 @@ class OllamaLLMService(LLMService):
         raise NotImplementedError("Count tokens is not implemented for Ollama LLM")
 
     def resume_changes(
-        self, repo: Repo, explanation: Optional[str] = None
+        self,
+        repo: Repo,
+        explanation: Optional[str] = None,
     ) -> Optional[str]:
         """Resume changes.
 
@@ -67,6 +69,8 @@ class OllamaLLMService(LLMService):
         repo: Repo,
         explanation: Optional[str] = None,
         resume: Optional[LLMService] = None,
+        no_feat: bool = False,
+        debug: bool = False,
     ) -> Optional[CommitMessage]:
         """Generate a commit message.
 
@@ -74,8 +78,10 @@ class OllamaLLMService(LLMService):
             repo (git.Repo): The repository to generate the commit message for.
             explanation (str, optional): The explanation of the changes. Defaults to None.
             resume (LLMService, optional): The resume of the changes. Defaults to None.
+            no_feat (bool, optional): Whether to ignore the `feat` commit type. Defaults to False.
+            debug (bool, optional): Whether to display debug information. Defaults to False.
         """
-        prompt = llms.prompt_commit_from_files(repo, explanation)
+        prompt = llms.prompt_commit_from_files(repo, explanation, no_feat, debug)
 
         if prompt is None:
             return None
