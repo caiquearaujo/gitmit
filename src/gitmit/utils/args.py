@@ -70,7 +70,7 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         help="Set the mode of the commit.",
         type=str,
         choices=["manual", "ai"],
-        default=None,
+        default="ai",
     )
 
     parser.add_argument(

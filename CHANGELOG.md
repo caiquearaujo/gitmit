@@ -24,3 +24,9 @@
 
 - [Add] Add `versioning` command;
 - [Add] Add `merge` command.
+
+## v0.5.0 at 2025-08-22
+
+- [Add] Add `.gitmitignore` file to support to exclude files from commit prompt;
+- [Add] Add `--no-feat` option to ignore `feat` commit type at commit prompt;
+- [Changes] Commit prompt improvements.
