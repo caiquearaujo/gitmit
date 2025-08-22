@@ -6,6 +6,10 @@ import git
 
 from .types import get_commit_types_resume
 from .files import load_all
+from ..utils.terminal import (
+    display_info,
+    Panel,
+)
 
 
 def prompt_resume_changes(repo: git.Repo, explanation: str = None) -> Optional[str]:
@@ -95,7 +99,10 @@ def prompt_commit_from_resume(
 
 
 def prompt_commit_from_files(
-    repo: git.Repo, explanation: Optional[str] = None, no_feat: bool = False
+    repo: git.Repo,
+    explanation: Optional[str] = None,
+    no_feat: bool = False,
+    debug: bool = False,
 ) -> Optional[str]:
     """Generate a commit message for the changes on the given repository.
 
@@ -106,7 +113,7 @@ def prompt_commit_from_files(
     Returns:
         Optional[str]: The generated commit message.
     """
-    changes = load_all(repo)
+    changes = load_all(repo, debug)
 
     if changes is None:
         return None
@@ -141,6 +148,15 @@ def prompt_commit_from_files(
     if no_feat:
         contents.append(
             "⚠️ ADIVICE: YOU ARE COMMITTING CHANGES THAT ARE NOT RELATED TO A NEW FEATURE. DO NOT USE 'feat' COMMIT TYPE."
+        )
+
+    if debug:
+        display_info(
+            Panel(
+                "\n".join(contents),
+                style="bold yellow",
+                title="(Debug) Current Prompt",
+            )
         )
 
     return "\n".join(contents)

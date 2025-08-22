@@ -7,8 +7,12 @@ from typing import Union, Optional
 from pydantic import BaseModel
 from git import Repo
 
-from ..utils.terminal import display_warning
 from ..utils.gitignore import GitignoreParser
+from ..utils.terminal import (
+    display_warning,
+    display_info,
+    Panel,
+)
 
 
 class FileType(Enum):
@@ -106,7 +110,7 @@ def load_modified_files(
     return files
 
 
-def load_all(repo: Repo) -> Union[str, None]:
+def load_all(repo: Repo, debug: bool = False) -> Union[str, None]:
     """Load all untracked and modified files as raw string
 
     Args:
@@ -120,6 +124,15 @@ def load_all(repo: Repo) -> Union[str, None]:
 
     if not files or len(files) == 0:
         return None
+
+    if debug:
+        display_info(
+            Panel(
+                "\n".join([f"{file.name} ({file.type.value})" for file in files]),
+                style="bold yellow",
+                title="(Debug) Files related to commit",
+            )
+        )
 
     txt = []
 

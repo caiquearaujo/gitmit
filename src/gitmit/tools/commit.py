@@ -30,6 +30,7 @@ class CommitSettings(BaseModel):
     mode: str = None
     brief: str = None
     no_feat: bool = False
+    debug: bool = False
 
 
 class CommitTool:
@@ -113,7 +114,7 @@ class CommitTool:
         if self.services.commit.supports(LLMAction.COMMIT_MESSAGE) is False:
             raise ValueError("Selected LLM does not support commit message generation.")
 
-        console.print(Panel("> Generate your commit message", style="bold cyan"))
+        console.print(Panel("> Generating your commit message", style="bold cyan"))
 
         # @note first, check local usage to grant it can call LLM later
         if self.services.commit.supports(LLMAction.TOKENS_USED):
@@ -178,6 +179,7 @@ class CommitTool:
             explanation=explanation,
             resume=self.services.resume,
             no_feat=self.settings.no_feat,
+            debug=self.settings.debug,
         )
 
         if commit_message is None:

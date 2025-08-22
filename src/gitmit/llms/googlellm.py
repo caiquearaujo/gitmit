@@ -81,6 +81,7 @@ class GoogleLLMService(LLMService):
         explanation: Optional[str] = None,
         resume: Optional[LLMService] = None,
         no_feat: bool = False,
+        debug: bool = False,
     ) -> Optional[CommitMessage]:
         """Generate a commit message.
 
@@ -88,6 +89,8 @@ class GoogleLLMService(LLMService):
             repo (git.Repo): The repository to generate the commit message for.
             explanation (str, optional): The explanation of the changes. Defaults to None.
             resume (LLMService, optional): The resume of the changes. Defaults to None.
+            no_feat (bool, optional): Whether to ignore the `feat` commit type. Defaults to False.
+            debug (bool, optional): Whether to display debug information. Defaults to False.
         """
         self.database.start()
         prompt = None
@@ -97,7 +100,7 @@ class GoogleLLMService(LLMService):
                 resume.resume_changes(repo, explanation), explanation
             )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation, no_feat)
+            prompt = llms.prompt_commit_from_files(repo, explanation, no_feat, debug)
 
         if prompt is None:
             return None
