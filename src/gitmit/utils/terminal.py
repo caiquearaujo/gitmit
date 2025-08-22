@@ -5,6 +5,7 @@ from typing import Callable, Optional
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
+from rich.table import Table
 
 console = Console()
 
@@ -36,13 +37,16 @@ def display_warning(message: str) -> None:
     console.print(message, style="bold yellow")
 
 
-def display_info(message: str) -> None:
+def display_info(message) -> None:
     """Display an info message.
 
     Args:
-        message (str): The message to display.
+        message: The message to display (can be str, Panel, Table, etc).
     """
-    console.print(message, style="bold blue")
+    if isinstance(message, str):
+        console.print(message, style="bold blue")
+    else:
+        console.print(message)
 
 
 def clear():

@@ -4,6 +4,7 @@ import sys
 from .services.config import init
 from .services.git import GitService
 from .tools.commit import CommitTool, CommitSettings
+from .tools.config import ConfigTool
 from .tools.init import InitTool, InitSettings
 from .tools.merge import MergeTool, MergeSettings
 from .tools.update import UpdateTool
@@ -34,9 +35,8 @@ def signal_handler(signum, frame):
 
 def startup(args):
     if args.command == "config":
-        display_info(
-            "Config file created successfully. See at: [bold yellow]~/.config/gitmit/config.ini[/bold yellow]"
-        )
+        # Always show current configuration
+        ConfigTool(services=config).run()
         return
 
     service = GitService(args.path)
