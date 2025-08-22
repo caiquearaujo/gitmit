@@ -29,6 +29,7 @@ class CommitSettings(BaseModel):
     force: bool = False
     mode: str = None
     brief: str = None
+    no_feat: bool = False
 
 
 class CommitTool:
@@ -176,6 +177,7 @@ class CommitTool:
             self.git_service.repo,
             explanation=explanation,
             resume=self.services.resume,
+            no_feat=self.settings.no_feat,
         )
 
         if commit_message is None:

@@ -47,7 +47,7 @@ def prompt_resume_changes(repo: git.Repo, explanation: str = None) -> Optional[s
 
 
 def prompt_commit_from_resume(
-    resume: str, explanation: Optional[str] = None
+    resume: str, explanation: Optional[str] = None, no_feat: bool = False
 ) -> Optional[str]:
     """Generate a commit message from the resume of the changes.
 
@@ -86,11 +86,16 @@ def prompt_commit_from_resume(
         contents.append(explanation)
         contents.append("<<: end of USER EXPLANATION")
 
+    if no_feat:
+        contents.append(
+            "⚠️ ADIVICE: YOU ARE COMMITTING CHANGES THAT ARE NOT RELATED TO A NEW FEATURE. DO NOT USE 'feat' COMMIT TYPE."
+        )
+
     return "\n".join(contents)
 
 
 def prompt_commit_from_files(
-    repo: git.Repo, explanation: Optional[str] = None
+    repo: git.Repo, explanation: Optional[str] = None, no_feat: bool = False
 ) -> Optional[str]:
     """Generate a commit message for the changes on the given repository.
 
@@ -132,5 +137,10 @@ def prompt_commit_from_files(
         contents.append(":>> USER EXPLANATION")
         contents.append(explanation)
         contents.append("<<: end of USER EXPLANATION")
+
+    if no_feat:
+        contents.append(
+            "⚠️ ADIVICE: YOU ARE COMMITTING CHANGES THAT ARE NOT RELATED TO A NEW FEATURE. DO NOT USE 'feat' COMMIT TYPE."
+        )
 
     return "\n".join(contents)

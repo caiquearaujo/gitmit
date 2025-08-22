@@ -81,6 +81,12 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         default=None,
     )
 
+    parser.add_argument(
+        "--no-feat",
+        help="This option is useful when you want to commit changes that are not related to a new feature.",
+        action="store_true",
+    )
+
     return parser
 
 

@@ -80,6 +80,7 @@ class GoogleLLMService(LLMService):
         repo: Repo,
         explanation: Optional[str] = None,
         resume: Optional[LLMService] = None,
+        no_feat: bool = False,
     ) -> Optional[CommitMessage]:
         """Generate a commit message.
 
@@ -96,7 +97,7 @@ class GoogleLLMService(LLMService):
                 resume.resume_changes(repo, explanation), explanation
             )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation)
+            prompt = llms.prompt_commit_from_files(repo, explanation, no_feat)
 
         if prompt is None:
             return None

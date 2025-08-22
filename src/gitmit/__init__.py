@@ -60,6 +60,7 @@ def startup(args):
                 force=args.force,
                 mode=args.mode,
                 brief=args.brief,
+                no_feat=args.no_feat,
             ),
         ).run(),
         "init": lambda: InitTool(
