@@ -1,8 +1,3 @@
-# USER PROMPT - LARGE/MAJOR CHANGES
-# ==================================
-# Use this template for changes with magnitude LARGE or MAJOR
-# Placeholders: {{CHANGE_ANALYSIS}}, {{CHANGES}}, {{USER_EXPLANATION}}
-
 ## CHANGE ANALYSIS (Pre-computed)
 {{CHANGE_ANALYSIS}}
 

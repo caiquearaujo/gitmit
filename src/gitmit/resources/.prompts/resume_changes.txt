@@ -1,8 +1,3 @@
-# CHANGE RESUME PROMPT
-# ====================
-# For generating a summary of changes (not a commit message)
-# Placeholders: {{CHANGES}}, {{USER_EXPLANATION}}
-
 You are a senior software engineer summarizing code changes for documentation or review purposes.
 
 ## YOUR TASK

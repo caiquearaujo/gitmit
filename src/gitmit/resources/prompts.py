@@ -5,6 +5,7 @@ This module handles loading, caching, and rendering prompt templates
 for commit message generation.
 """
 
+import pkgutil
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -48,12 +49,9 @@ class PromptBuilder:
 
         Args:
             prompts_dir: Directory containing prompt templates.
-                        Defaults to 'prompts/' relative to this file.
+                        If None, uses pkgutil to load from package resources.
         """
-        if prompts_dir is None:
-            prompts_dir = Path(__file__).parent / ".prompts"
-
-        self.prompts_dir = Path(prompts_dir)
+        self.prompts_dir = Path(prompts_dir) if prompts_dir else None
         self._cache: dict[str, str] = {}
 
     def _load_template(self, name: str) -> str:
@@ -72,12 +70,33 @@ class PromptBuilder:
         if name in self._cache:
             return self._cache[name]
 
-        template_path = self.prompts_dir / f"{name}.txt"
+        if self.prompts_dir:
+            template_path = self.prompts_dir / f"{name}.txt"
 
-        if not template_path.exists():
-            raise FileNotFoundError(f"Template '{name}' not found at {template_path}")
+            if not template_path.exists():
+                raise FileNotFoundError(
+                    f"Template '{name}' not found at {template_path}"
+                )
 
-        content = template_path.read_text(encoding="utf-8")
+            content = template_path.read_text(encoding="utf-8")
+        else:
+            try:
+                data = pkgutil.get_data("gitmit.resources", f".prompts/{name}.txt")
+
+                if data is None:
+                    raise FileNotFoundError()
+
+                content = data.decode("utf-8")
+            except (FileNotFoundError, ModuleNotFoundError):
+                template_path = Path(__file__).parent / ".prompts" / f"{name}.txt"
+
+                if not template_path.exists():
+                    raise FileNotFoundError(
+                        f"Template '{name}' not found in package or at {template_path}"
+                    )
+
+                content = template_path.read_text(encoding="utf-8")
+
         self._cache[name] = content
         return content
 

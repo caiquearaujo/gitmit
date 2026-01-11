@@ -23,3 +23,6 @@ authors = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"gitmit.resources" = [".prompts/*.txt"]
