@@ -3,21 +3,21 @@ import sys
 
 from .services.config import init
 from .services.git import GitService
-from .tools.commit import CommitTool, CommitSettings
+from .tools.commit import CommitSettings, CommitTool
 from .tools.config import ConfigTool
-from .tools.init import InitTool, InitSettings
-from .tools.merge import MergeTool, MergeSettings
+from .tools.init import InitSettings, InitTool
+from .tools.merge import MergeSettings, MergeTool
 from .tools.update import UpdateTool
-from .tools.versioning import VersioningTool, VersioningSettings
+from .tools.versioning import VersioningSettings, VersioningTool
 from .utils.args import parse_args
 from .utils.terminal import (
-    display_success,
+    Panel,
     display_error,
     display_info,
-    Panel,
+    display_success,
 )
 
-__VERSION__ = "0.5.0"
+__VERSION__ = "0.6.0"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 
