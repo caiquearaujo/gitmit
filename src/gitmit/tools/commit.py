@@ -1,26 +1,27 @@
 """Commit message."""
 
 from datetime import datetime
+
 from pydantic import BaseModel
 
 from ..llms import LLMAction
 from ..resources.types import (
-    CommitType,
     CommitMessage,
+    CommitType,
     CommitTypeProps,
     get_commit_types,
 )
-from ..services.git import GitService
 from ..services.config import Services
+from ..services.git import GitService
 from ..utils.terminal import (
-    display_error,
-    display_warning,
-    display_info,
+    Panel,
     ask,
     ask_confirmation,
     choose,
-    Panel,
     console,
+    display_error,
+    display_info,
+    display_warning,
 )
 
 

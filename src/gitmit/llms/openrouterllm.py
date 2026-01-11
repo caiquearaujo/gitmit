@@ -1,15 +1,15 @@
 """OpenRouter LLM service."""
 
-from typing import Optional, List
+from typing import List, Optional
 
 import requests
 import tiktoken
 from git import Repo
 
-from . import LLMService, LLMAction
+from ..resources import llms
 from ..resources.types import CommitMessage
 from ..services.database import LLMUsageDatabaseService
-from ..resources import llms
+from . import LLMAction, LLMService
 
 
 class OpenRouterLLMService(LLMService):
@@ -33,8 +33,11 @@ class OpenRouterLLMService(LLMService):
         self.api_key = api_key
         self.model = model
         self.database = database
-        self.providers = [p.strip() for p in providers if p.strip()] if providers else None
+        self.providers = (
+            [p.strip() for p in providers if p.strip()] if providers else None
+        )
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.generator = llms.CommitPromptGenerator()
 
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
@@ -46,6 +49,8 @@ class OpenRouterLLMService(LLMService):
         repo: Repo,
         explanation: Optional[str] = None,
         resume: Optional["LLMService"] = None,
+        no_feat: bool = False,
+        debug: bool = False,
     ) -> int:
         """Count the tokens in the prompt using tiktoken estimation.
 
@@ -60,17 +65,26 @@ class OpenRouterLLMService(LLMService):
         prompt = None
 
         if resume is not None:
-            prompt = llms.prompt_commit_from_resume(
-                resume.resume_changes(repo, explanation), explanation
-            )
+            _resume = resume.resume_changes(repo, explanation=explanation)
+
+            if _resume is not None:
+                prompt = self.generator.generate_from_resume(
+                    _resume,
+                    explanation=explanation,
+                    no_feat=no_feat,
+                )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation)
+            prompt = self.generator.generate(
+                repo, explanation=explanation, no_feat=no_feat, debug=debug
+            )
 
         if prompt is None:
             return 0
 
         encoding = tiktoken.get_encoding("cl100k_base")
-        return len(encoding.encode(prompt))
+        message = f"{prompt.system_prompt}\n\n---\n\n{prompt.user_prompt}"
+
+        return len(encoding.encode(message))
 
     def resume_changes(
         self, repo: Repo, explanation: Optional[str] = None
@@ -104,25 +118,34 @@ class OpenRouterLLMService(LLMService):
         prompt = None
 
         if resume is not None:
-            prompt = llms.prompt_commit_from_resume(
-                resume.resume_changes(repo, explanation), explanation
-            )
+            _resume = resume.resume_changes(repo, explanation=explanation)
+
+            if _resume is not None:
+                prompt = self.generator.generate_from_resume(
+                    _resume,
+                    explanation=explanation,
+                    no_feat=no_feat,
+                )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation, no_feat, debug)
+            prompt = self.generator.generate(
+                repo, explanation=explanation, no_feat=no_feat, debug=debug
+            )
 
         if prompt is None:
             return None
 
         body = {
             "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": [
+                {"role": "system", "content": prompt.system_prompt},
+                {"role": "user", "content": prompt.user_prompt},
+            ],
             "response_format": {"type": "json_object"},
         }
 
         if self.providers:
             body["provider"] = {
-                "order": self.providers,
-                "allow_fallbacks": True,
+                "only": self.providers,
             }
 
         response = requests.post(

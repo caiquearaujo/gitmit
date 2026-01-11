@@ -6,10 +6,10 @@ from git import Repo
 from google import genai
 from google.genai import types as genai_types
 
-from . import LLMService, LLMAction
+from ..resources import llms
 from ..resources.types import CommitMessage
 from ..services.database import LLMUsageDatabaseService
-from ..resources import llms
+from . import LLMAction, LLMService
 
 
 class GoogleLLMService(LLMService):
@@ -25,6 +25,7 @@ class GoogleLLMService(LLMService):
         self.client = genai.Client(api_key=api_key)
         self.model = model
         self.database = database
+        self.generator = llms.CommitPromptGenerator()
 
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
@@ -36,6 +37,8 @@ class GoogleLLMService(LLMService):
         repo: Repo,
         explanation: Optional[str] = None,
         resume: Optional["LLMService"] = None,
+        no_feat: bool = False,
+        debug: bool = False,
     ) -> int:
         """Count the tokens in the prompt.
 
@@ -45,24 +48,34 @@ class GoogleLLMService(LLMService):
         prompt = None
 
         if resume is not None:
-            prompt = llms.prompt_commit_from_resume(
-                resume.resume_changes(repo, explanation), explanation
-            )
+            _resume = resume.resume_changes(repo, explanation=explanation)
+
+            if _resume is not None:
+                prompt = self.generator.generate_from_resume(
+                    _resume,
+                    explanation=explanation,
+                    no_feat=no_feat,
+                )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation)
+            prompt = self.generator.generate(
+                repo, explanation=explanation, no_feat=no_feat, debug=debug
+            )
 
         if prompt is None:
-            return None
+            return 0
 
         tokens = self.client.models.count_tokens(
             model=self.model,
             contents=prompt,
+            config=genai_types.CountTokensConfig(
+                system_instruction=prompt.system_prompt,
+            ),
         )
 
         if tokens is None:
             return 0
 
-        return tokens.total_tokens
+        return int(getattr(tokens, "total_tokens", 0))
 
     def resume_changes(
         self, repo: Repo, explanation: Optional[str] = None
@@ -96,19 +109,27 @@ class GoogleLLMService(LLMService):
         prompt = None
 
         if resume is not None:
-            prompt = llms.prompt_commit_from_resume(
-                resume.resume_changes(repo, explanation), explanation
-            )
+            _resume = resume.resume_changes(repo, explanation=explanation)
+
+            if _resume is not None:
+                prompt = self.generator.generate_from_resume(
+                    _resume,
+                    explanation=explanation,
+                    no_feat=no_feat,
+                )
         else:
-            prompt = llms.prompt_commit_from_files(repo, explanation, no_feat, debug)
+            prompt = self.generator.generate(
+                repo, explanation=explanation, no_feat=no_feat, debug=debug
+            )
 
         if prompt is None:
             return None
 
         response = self.client.models.generate_content(
             model=self.model,
-            contents=prompt,
+            contents=prompt.user_prompt,
             config=genai_types.GenerateContentConfig(
+                system_instruction=prompt.system_prompt,
                 response_mime_type="application/json",
                 response_schema=CommitMessage,
             ),

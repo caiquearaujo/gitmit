@@ -1,9 +1,9 @@
 """LLM services."""
 
-from enum import Enum
-
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Optional
+
 from git import Repo
 
 from ..resources.types import CommitMessage
@@ -31,6 +31,8 @@ class LLMService(ABC):
         repo: Repo,
         explanation: Optional[str] = None,
         resume: Optional["LLMService"] = None,
+        no_feat: bool = False,
+        debug: bool = False,
     ) -> int:
         """Count the tokens in the prompt.
 

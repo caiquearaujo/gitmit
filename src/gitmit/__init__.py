@@ -3,6 +3,7 @@ import sys
 
 from .services.config import init
 from .services.git import GitService
+from .tools.analyze import AnalyzeTool
 from .tools.commit import CommitSettings, CommitTool
 from .tools.config import ConfigTool
 from .tools.init import InitSettings, InitTool
@@ -63,6 +64,10 @@ def startup(args):
                 no_feat=args.no_feat,
                 debug=args.debug,
             ),
+        ).run(),
+        "analyze": lambda: AnalyzeTool(
+            service,
+            services=config,
         ).run(),
         "init": lambda: InitTool(
             service,

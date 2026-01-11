@@ -2,17 +2,10 @@
 
 from enum import Enum
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
-from pydantic import BaseModel
 from git import Repo
-
-from ..utils.gitignore import GitignoreParser
-from ..utils.terminal import (
-    display_warning,
-    display_info,
-    Panel,
-)
+from pydantic import BaseModel
 
 
 class FileType(Enum):
@@ -28,6 +21,52 @@ class File(BaseModel):
     name: str
     content: str
     type: FileType
+
+
+class GitignoreParser:
+    """
+    Simple gitignore-style parser for .gitmitignore files.
+
+    This is a simplified implementation. For production, consider using
+    the `pathspec` library which handles all gitignore edge cases.
+    """
+
+    def __init__(self, patterns: list[str]):
+        self.patterns = [
+            p.strip() for p in patterns if p.strip() and not p.startswith("#")
+        ]
+
+    @classmethod
+    def from_file(cls, repo_path: Path) -> "GitignoreParser":
+        """Load patterns from .gitmitignore file."""
+        gitmitignore_path = repo_path / ".gitmitignore"
+
+        if not gitmitignore_path.exists():
+            return cls([])
+
+        with open(gitmitignore_path, "r", encoding="utf-8") as f:
+            patterns = f.readlines()
+
+        return cls(patterns)
+
+    def should_ignore(self, filepath: str) -> bool:
+        """Check if a filepath should be ignored."""
+        from fnmatch import fnmatch
+
+        for pattern in self.patterns:
+            # Handle directory patterns (ending with /)
+            if pattern.endswith("/"):
+                if filepath.startswith(pattern) or f"/{pattern}" in filepath:
+                    return True
+            # Handle negation patterns
+            elif pattern.startswith("!"):
+                if fnmatch(filepath, pattern[1:]):
+                    return False
+            # Standard pattern matching
+            elif fnmatch(filepath, pattern) or fnmatch(Path(filepath).name, pattern):
+                return True
+
+        return False
 
 
 def _get_gitignore_parser(repo: Repo) -> Optional[GitignoreParser]:
@@ -55,10 +94,13 @@ def load_untracked_files(
 
     Args:
         repo (Repo): Current git repository.
+        ignore_parser: Optional parser for .gitmitignore patterns.
 
     Returns:
-        list[File]: A collection of all untracked files."""
+        list[File]: A collection of all untracked files.
+    """
     files = []
+    repo_path = Path(repo.working_dir)
 
     for file in repo.untracked_files:
         # Check if file should be ignored
@@ -66,11 +108,16 @@ def load_untracked_files(
             continue
 
         try:
-            with open(file, "r", encoding="utf-8") as f:
+            file_path = repo_path / file
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 files.append(File(name=file, content=content, type=FileType.UNTRACKED))
         except Exception:
-            files.append(File(name=file, content="<unknown>", type=FileType.UNTRACKED))
+            files.append(
+                File(
+                    name=file, content="<binary or unreadable>", type=FileType.UNTRACKED
+                )
+            )
             continue
 
     return files
@@ -83,11 +130,18 @@ def load_modified_files(
 
     Args:
         repo (Repo): Current git repository.
+        ignore_parser: Optional parser for .gitmitignore patterns.
 
     Returns:
-        list[File]: A collection of all modified files."""
+        list[File]: A collection of all modified files.
+    """
     files = []
-    lookup = repo.git.diff("HEAD", "--name-only").splitlines()
+
+    try:
+        lookup = repo.git.diff("HEAD", "--name-only").splitlines()
+    except Exception:
+        # Repository might not have any commits yet
+        return files
 
     for file in lookup:
         # Check if file should be ignored
@@ -103,22 +157,24 @@ def load_modified_files(
                 )
             )
         except Exception as e:
-            # display warning but ignore
-            display_warning(f"Cannot load file {file}: {e}")
+            # File might have been deleted or is binary
+            print(f"Warning: Cannot load file {file}: {e}")
             continue
 
     return files
 
 
 def load_all(repo: Repo, debug: bool = False) -> Union[str, None]:
-    """Load all untracked and modified files as raw string
+    """Load all untracked and modified files as raw string.
 
     Args:
         repo (Repo): Current git repository.
+        debug: If True, print debug information.
 
     Returns:
         str: A raw string containing all files.
-        none: If no changes were found on current repository."""
+        None: If no changes were found on current repository.
+    """
     parser = _get_gitignore_parser(repo)
     files = load_untracked_files(repo, parser) + load_modified_files(repo, parser)
 
@@ -126,13 +182,10 @@ def load_all(repo: Repo, debug: bool = False) -> Union[str, None]:
         return None
 
     if debug:
-        display_info(
-            Panel(
-                "\n".join([f"{file.name} ({file.type.value})" for file in files]),
-                style="bold yellow",
-                title="(Debug) Files related to commit",
-            )
-        )
+        print("=== Files related to commit ===")
+        for file in files:
+            print(f"  {file.name} ({file.type.value})")
+        print()
 
     txt = []
 
