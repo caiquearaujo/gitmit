@@ -32,6 +32,7 @@ class CommitSettings(BaseModel):
     brief: str = None
     no_feat: bool = False
     debug: bool = False
+    dry_run: bool = False
 
 
 class CommitTool:
@@ -105,10 +106,13 @@ class CommitTool:
 
                 return
 
-        self.git_service.commit(message)
+        if self.settings.dry_run:
+            display_warning("[DRY-RUN] Commit and push skipped.")
+        else:
+            self.git_service.commit(message)
 
-        if self.settings.push:
-            self.__push_to_remote(branch)
+            if self.settings.push:
+                self.__push_to_remote(branch)
 
     def __llm_commit(self):
         """Commit using LLM."""

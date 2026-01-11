@@ -66,10 +66,7 @@ class GoogleLLMService(LLMService):
 
         tokens = self.client.models.count_tokens(
             model=self.model,
-            contents=prompt,
-            config=genai_types.CountTokensConfig(
-                system_instruction=prompt.system_prompt,
-            ),
+            contents=f"{prompt.system_prompt}\n\n{prompt.user_prompt}",
         )
 
         if tokens is None:

@@ -63,6 +63,7 @@ def startup(args):
                 brief=args.brief,
                 no_feat=args.no_feat,
                 debug=args.debug,
+                dry_run=args.dry_run,
             ),
         ).run(),
         "analyze": lambda: AnalyzeTool(

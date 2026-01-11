@@ -92,6 +92,12 @@ def __commit_parser(subparsers: argparse._SubParsersAction):
         action="store_true",
     )
 
+    parser.add_argument(
+        "--dry-run",
+        help="Run everything except git operations (commit and push). Useful for testing.",
+        action="store_true",
+    )
+
     return parser
 
 
