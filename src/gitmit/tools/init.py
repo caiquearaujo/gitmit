@@ -1,10 +1,11 @@
 """Commit message."""
 
 from pydantic import BaseModel
+from rich.panel import Panel
 
-from ..services.git import GitService
 from ..services.config import Services
-from ..utils.terminal import Panel, display_info
+from ..services.git import GitService
+from ..utils.terminal import display_info
 
 
 class InitSettings(BaseModel):
@@ -19,9 +20,9 @@ class InitTool:
         self, git_service: GitService, services: Services, settings: InitSettings
     ):
         """Initialize the commit tool."""
-        self.git_service = git_service
-        self.services = services
-        self.settings = settings
+        self.git_service: GitService = git_service
+        self.services: Services = services
+        self.settings: InitSettings = settings
 
     def run(self):
         """Run the commit tool."""

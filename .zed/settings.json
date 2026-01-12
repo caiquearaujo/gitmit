@@ -1,0 +1,9 @@
+{
+    "languages": {
+        "Python": {
+            "language_servers": ["basedpyright", "ruff"],
+            "enable_language_server": true,
+            "show_completions_on_input": true
+        }
+    }
+}

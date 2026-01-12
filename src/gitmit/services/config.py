@@ -2,29 +2,29 @@
 
 import configparser
 import os
-from typing import Optional
-
 from pathlib import Path
+from typing import Callable
 
 from pydantic import BaseModel
 
-from ..services.database import ConnectionModel, LLMUsageDatabaseService
-from ..llms.ollamallm import OllamaLLMService
-from ..llms.googlellm import GoogleLLMService
 from ..llms import LLMService
+from ..llms.googlellm import GoogleLLMService
+from ..llms.ollamallm import OllamaLLMService
+from ..llms.openrouterllm import OpenRouterLLMService
+from ..services.database import ConnectionModel, LLMUsageDatabaseService
 
 
 class Services(BaseModel):
     """Services for the application."""
 
     commit: LLMService
-    resume: Optional[LLMService]
+    resume: LLMService | None
     database: LLMUsageDatabaseService
     path: str
     file_created: bool = False
 
     class Config:
-        arbitrary_types_allowed = True
+        arbitrary_types_allowed: bool = True
 
 
 def __required_param(config: configparser.ConfigParser, section: str, param: str):
@@ -39,7 +39,7 @@ def __required_param(config: configparser.ConfigParser, section: str, param: str
         raise ValueError(f"Missing required parameter '{param}' in section '{section}'")
 
 
-def __parse_model(model: str, allow_none=False) -> Optional[dict[str, str]]:
+def __parse_model(model: str, allow_none: bool = False) -> dict[str, str] | None:
     """Parse the model from the config.
 
     Args:
@@ -60,7 +60,9 @@ def __parse_model(model: str, allow_none=False) -> Optional[dict[str, str]]:
     return {"service": parts[0], "model": parts[1]}
 
 
-def __evaluate(config: configparser.ConfigParser, path: str, file_created: bool = False):
+def __evaluate(
+    config: configparser.ConfigParser, path: str, file_created: bool = False
+):
     """Evaluate the config.
 
     Args:
@@ -68,7 +70,7 @@ def __evaluate(config: configparser.ConfigParser, path: str, file_created: bool 
     """
     connection = ConnectionModel(
         host=config.get("mysql", "host"),
-        port=config.get("mysql", "port"),
+        port=int(config.get("mysql", "port")),
         user=config.get("mysql", "user"),
         password=config.get("mysql", "password"),
         database=config.get("mysql", "database"),
@@ -76,19 +78,26 @@ def __evaluate(config: configparser.ConfigParser, path: str, file_created: bool 
 
     database = LLMUsageDatabaseService(connection)
 
-    services = {
+    services: dict[str, Callable[[configparser.ConfigParser, str], LLMService]] = {
         "google": lambda c, m: GoogleLLMService(
             api_key=c.get("google", "api_key"), database=database, model=m
         ),
         "ollama": lambda c, m: OllamaLLMService(host=c.get("ollama", "host"), model=m),
+        "openrouter": lambda c, m: OpenRouterLLMService(
+            api_key=c.get("openrouter", "api_key"),
+            database=database,
+            model=m,
+            providers=c.get("openrouter", "providers", fallback="").split(","),
+        ),
     }
 
-    commit_validators = {
+    commit_validators: dict[str, Callable[[configparser.ConfigParser], None]] = {
         "google": lambda c: __required_param(c, "google", "api_key"),
         "ollama": lambda c: __required_param(c, "ollama", "host"),
+        "openrouter": lambda c: __required_param(c, "openrouter", "api_key"),
     }
 
-    resume_validators = {
+    resume_validators: dict[str, Callable[[configparser.ConfigParser], None]] = {
         "ollama": lambda c: __required_param(c, "ollama", "host"),
     }
 
@@ -100,6 +109,11 @@ def __evaluate(config: configparser.ConfigParser, path: str, file_created: bool 
 
     commit_model = __parse_model(commit_value)
     resume_model = __parse_model(resume_value) if resume_value else None
+
+    if commit_model is None:
+        raise ValueError(
+            "Cannot load any commit model. Please, check your configuration file."
+        )
 
     try:
         commit_validators[commit_model["service"]](config)
@@ -194,9 +208,14 @@ def __create(config: configparser.ConfigParser, file: str):
         "host": "http://localhost:11434",
     }
 
+    config["openrouter"] = {
+        "api_key": "<your-openrouter-api-key>",
+        "providers": "",
+    }
+
     config["mysql"] = {
         "host": "localhost",
-        "port": 3306,
+        "port": "3306",
         "user": "root",
         "password": "<your-mysql-password>",
         "database": "gitmit",

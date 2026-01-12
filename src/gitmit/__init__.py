@@ -3,21 +3,23 @@ import sys
 
 from .services.config import init
 from .services.git import GitService
-from .tools.commit import CommitTool, CommitSettings
+from .tools.analyze import AnalyzeTool
+from .tools.commit import CommitSettings, CommitTool
 from .tools.config import ConfigTool
-from .tools.init import InitTool, InitSettings
-from .tools.merge import MergeTool, MergeSettings
+from .tools.init import InitSettings, InitTool
+from .tools.merge import MergeSettings, MergeTool
 from .tools.update import UpdateTool
-from .tools.versioning import VersioningTool, VersioningSettings
+from .tools.versioning import VersioningSettings, VersioningTool
 from .utils.args import parse_args
 from .utils.terminal import (
-    display_success,
+    Panel,
     display_error,
     display_info,
-    Panel,
+    display_success,
+    display_warning,
 )
 
-__VERSION__ = "0.5.0"
+__VERSION__ = "0.6.0"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 
@@ -62,7 +64,12 @@ def startup(args):
                 brief=args.brief,
                 no_feat=args.no_feat,
                 debug=args.debug,
+                dry_run=args.dry_run,
             ),
+        ).run(),
+        "analyze": lambda: AnalyzeTool(
+            service,
+            services=config,
         ).run(),
         "init": lambda: InitTool(
             service,
@@ -91,24 +98,33 @@ def startup(args):
         ).run(),
     }
 
-    func = switcher.get(args.command, False)
+    func = switcher.get(args.command, None)
 
-    if func == False:
+    if not func:
         display_error(
             "The command {command} was not found.".format(command=args.command),
         )
 
         return
 
-    if type(func) == dict:
+    if isinstance(func, dict):
         func = func.get(args.action, False)
 
-        if func == False:
+        if not func:
             display_error(
                 "The action {action} was not found for {command}.".format(
                     action=args.action, command=args.command
                 ),
             )
+
+            return
+
+    if not callable(func):
+        display_error(
+            "Unexpected error for {command}.".format(command=args.command),
+        )
+
+        return
 
     func()
 
@@ -120,6 +136,8 @@ def main():
 
     try:
         startup(args)
+    except KeyboardInterrupt:
+        display_warning("Interruping application...")
     except Exception as e:
         display_error(f"An unexpected error occurred. See: {e}.")
     finally:

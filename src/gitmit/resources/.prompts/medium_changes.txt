@@ -1,0 +1,36 @@
+## CHANGE ANALYSIS (Pre-computed)
+{{CHANGE_ANALYSIS}}
+
+## GUIDANCE FOR MEDIUM-SIZED CHANGES
+
+This is a **MEDIUM-sized change**. Consider the following:
+
+1. **Evaluate the nature** of the change carefully:
+   - Is this genuinely new functionality? → `feat`
+   - Is this improving existing code? → `enhancement` or `refactor`
+   - Is this restructuring without behavior change? → `refactor`
+   - Is this fixing issues? → `bugfix`
+
+2. **The description should**:
+   - Mention key files/modules affected
+   - Explain the purpose of the change
+   - Reference specific functions/classes if significant
+
+3. **User explanation priority**:
+   - If the user says what this is, trust them
+   - Use their words in your description
+   - Match their categorization intent
+
+## CODE CHANGES
+```
+{{CHANGES}}
+```
+
+{{USER_EXPLANATION_SECTION}}
+
+## YOUR TASK
+Analyze the changes above and generate a commit message that:
+1. Accurately categorizes the change type
+2. Provides a meaningful short description (imperative mood, <80 chars)
+3. Gives useful detail in the long description
+4. Explains your reasoning briefly

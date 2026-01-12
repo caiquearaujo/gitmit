@@ -1,0 +1,33 @@
+## CHANGE ANALYSIS (Pre-computed)
+{{CHANGE_ANALYSIS}}
+
+## IMPORTANT GUIDANCE FOR THIS CHANGE
+
+⚠️ **This is a SMALL change. Calibrate your response accordingly.**
+
+For small changes like this:
+1. **DO NOT** use `feat` unless the user explicitly says it's a new feature
+2. **DO NOT** over-describe - a few sentences is enough
+3. **PREFER** types like: `style`, `refactor`, `chore`, `bugfix`, `enhancement`
+4. **BE PRECISE** - mention the specific file/function changed
+
+Common small change patterns:
+- Variable/function renames → `style` or `refactor`
+- Import reorganization → `style`
+- Adding type hints → `style` or `enhancement`
+- Fixing a small bug → `bugfix`
+- Adding a helper method → `enhancement`
+- Updating config → `chore`
+
+## CODE CHANGES
+```
+{{CHANGES}}
+```
+
+{{USER_EXPLANATION_SECTION}}
+
+## YOUR TASK
+Analyze the changes above and generate a commit message. Remember:
+- This is a small change - keep the description proportional
+- The user's explanation (if provided) is your primary guide
+- Avoid `feat` unless explicitly warranted

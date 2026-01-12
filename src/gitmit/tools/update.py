@@ -1,10 +1,9 @@
-import requests
+import os
 import shutil
 import sys
-import os
 import uuid
 
-from pydantic import BaseModel
+import requests
 from rich.progress import Progress
 
 from ..utils.terminal import display_error, display_success
@@ -15,8 +14,8 @@ class UpdateTool:
 
     def __init__(self, version: str, repo: str = "caiquearaujo/gitmit"):
         """Initialize the update tool."""
-        self.version = version
-        self.repo = repo
+        self.version: str = version
+        self.repo: str = repo
 
     def run(self, force: bool = False):
         """Run the update tool."""
@@ -28,7 +27,7 @@ class UpdateTool:
             display_error("Cannot fetch the latest version from GitHub.")
             return
 
-        release_info = response.json()
+        release_info: dict[str, str] = response.json()
         latest_version = release_info.get("tag_name")
         current_version = self.version
 

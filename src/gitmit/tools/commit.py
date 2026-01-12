@@ -1,36 +1,39 @@
 """Commit message."""
 
 from datetime import datetime
+
+from git.repo import Repo
 from pydantic import BaseModel
+from rich.panel import Panel
 
 from ..llms import LLMAction
 from ..resources.types import (
-    CommitType,
     CommitMessage,
+    CommitType,
     CommitTypeProps,
     get_commit_types,
 )
-from ..services.git import GitService
 from ..services.config import Services
+from ..services.git import GitService
 from ..utils.terminal import (
-    display_error,
-    display_warning,
-    display_info,
     ask,
     ask_confirmation,
     choose,
-    Panel,
     console,
+    display_error,
+    display_info,
+    display_warning,
 )
 
 
 class CommitSettings(BaseModel):
     push: bool = False
     force: bool = False
-    mode: str = None
-    brief: str = None
+    mode: str | None = None
+    brief: str | None = None
     no_feat: bool = False
     debug: bool = False
+    dry_run: bool = False
 
 
 class CommitTool:
@@ -44,9 +47,9 @@ class CommitTool:
         if not git_service.exists():
             raise ValueError("No git repository found.")
 
-        self.git_service = git_service
-        self.services = services
-        self.settings = settings
+        self.git_service: GitService = git_service
+        self.services: Services = services
+        self.settings: CommitSettings = settings
 
     def run(self):
         """Run the commit tool."""
@@ -104,10 +107,13 @@ class CommitTool:
 
                 return
 
-        self.git_service.commit(message)
+        if self.settings.dry_run:
+            display_warning("[DRY-RUN] Commit and push skipped.")
+        else:
+            self.git_service.commit(message)
 
-        if self.settings.push:
-            self.__push_to_remote(branch)
+            if self.settings.push:
+                self.__push_to_remote(branch)
 
     def __llm_commit(self):
         """Commit using LLM."""
@@ -115,6 +121,7 @@ class CommitTool:
             raise ValueError("Selected LLM does not support commit message generation.")
 
         console.print(Panel("> Generating your commit message", style="bold cyan"))
+        current_usage = 0
 
         # @note first, check local usage to grant it can call LLM later
         if self.services.commit.supports(LLMAction.TOKENS_USED):
@@ -140,7 +147,7 @@ class CommitTool:
         # @note second, estimate count usage for current prompt
         if self.services.commit.supports(LLMAction.COUNT_TOKENS):
             response = self.services.commit.count_tokens(
-                self.git_service.repo, explanation=None, resume=self.services.resume
+                self.__get_repo(), explanation=None, resume=self.services.resume
             )
 
             display_info(
@@ -175,7 +182,7 @@ class CommitTool:
             explanation = self.settings.brief
 
         commit_message = self.services.commit.commit_message(
-            self.git_service.repo,
+            self.__get_repo(),
             explanation=explanation,
             resume=self.services.resume,
             no_feat=self.settings.no_feat,
@@ -193,7 +200,7 @@ class CommitTool:
             commit_title=commit_message.type.value,
             commit_emoji=":bricks:",
             preview_emoji="🧱",
-            commit_type="other",
+            commit_type=CommitType.OTHER,
             commit_meaning="This commit type is useful when doing other things not related to the other commit types.",
         )
 
@@ -301,3 +308,11 @@ class CommitTool:
                         return
 
         self.git_service.pushTo(branch, origin_name)
+
+    def __get_repo(self) -> Repo:
+        repo = self.git_service.repo
+
+        if repo is False:
+            raise RuntimeError("Cannot get the current git repository...")
+
+        return repo

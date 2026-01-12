@@ -1,6 +1,12 @@
 """Git service."""
 
-import git
+from typing import TYPE_CHECKING, Literal
+
+from git import Git, Repo
+
+if TYPE_CHECKING:
+    from git.remote import Remote
+    from git.util import IterableList
 
 
 class GitService:
@@ -10,7 +16,11 @@ class GitService:
         path (str): The path to the Git repository.
     """
 
-    def __init__(self, path):
+    repo: Repo | Literal[False]
+    path: str
+    git: Git
+
+    def __init__(self, path: str):
         """Initialize the GitService class.
 
         Args:
@@ -19,20 +29,20 @@ class GitService:
         self.repo = GitService.buildRepo(path)
         self.path = path
 
-        if self.repo != False:
+        if self.repo is not False:
             self.git = self.repo.git
 
-    def getRepo(self) -> git.Repo:
+    def getRepo(self) -> Repo | Literal[False]:
         """Get the Git repository.
 
         Returns:
-            git.Repo: The Git repository.
+            Repo: The Git repository.
         """
         return self.repo
 
-    def init(self):
+    def init(self) -> None:
         """Initialize the Git repository."""
-        self.repo = git.Repo.init(self.path)
+        self.repo = Repo.init(self.path)
         self.git = self.repo.git
 
     def exists(self) -> bool:
@@ -41,7 +51,7 @@ class GitService:
         Returns:
             bool: True if the Git repository exists, False otherwise.
         """
-        return self.repo != False
+        return self.repo is not False
 
     def getPath(self) -> str:
         """Get the path to the Git repository.
@@ -49,12 +59,12 @@ class GitService:
         Returns:
             str: The path to the Git repository.
         """
-        if self.repo == False:
+        if self.repo is False:
             return self.path
 
-        return self.repo.working_dir
+        return str(self.repo.working_dir)
 
-    def commit(self, message: str):
+    def commit(self, message: str) -> None:
         """Commit the changes.
 
         Args:
@@ -63,15 +73,17 @@ class GitService:
         self.git.add("--all")
         self.git.commit("-m", message)
 
-    def currentBranch(self):
+    def currentBranch(self) -> str:
         """Get the current branch.
 
         Returns:
             str: The current branch.
         """
-        return self.git.branch("--show-current")
+        return str(self.git.branch("--show-current"))
 
-    def createBranch(self, branch: str, origin: str = "origin", track: bool = True):
+    def createBranch(
+        self, branch: str, origin: str = "origin", track: bool = True
+    ) -> None:
         """Create a new branch.
 
         Args:
@@ -85,7 +97,7 @@ class GitService:
         else:
             self.git.checkout("-b", branch)
 
-    def remote(self, url: str, name: str = "origin"):
+    def remote(self, url: str, name: str = "origin") -> None:
         """Add a remote to the Git repository.
 
         Args:
@@ -94,13 +106,16 @@ class GitService:
         """
         self.git.remote("add", name, url)
 
-    def remoteExists(self, name: str):
-        if self.git == False:
+    def remoteExists(self, name: str) -> bool:
+        if self.repo is False:
             return False
 
-        return name in [remote.name for remote in self.repo.remotes]
+        remotes: "IterableList[Remote]" = self.repo.remotes
+        return name in [remote.name for remote in remotes]
 
-    def pushTo(self, branch: str, origin: str = "origin", upstream: bool = True):
+    def pushTo(
+        self, branch: str, origin: str = "origin", upstream: bool = True
+    ) -> None:
         """Push the changes to the remote.
 
         Args:
@@ -113,7 +128,7 @@ class GitService:
         else:
             self.git.push(origin, branch)
 
-    def renameTo(self, new: str):
+    def renameTo(self, new: str) -> None:
         """Rename the current branch to a new name.
 
         Args:
@@ -129,7 +144,7 @@ class GitService:
         """
         return self.git.status("--porcelain") != ""
 
-    def checkout(self, branch: str):
+    def checkout(self, branch: str) -> None:
         """Checkout to a branch.
 
         Args:
@@ -137,7 +152,7 @@ class GitService:
         """
         self.git.checkout(branch)
 
-    def pull(self, remote: str = "origin", branch: str = None):
+    def pull(self, remote: str = "origin", branch: str | None = None) -> str:
         """Pull changes from the remote repository.
 
         Args:
@@ -148,11 +163,11 @@ class GitService:
             str: The output from the pull command.
         """
         if branch:
-            return self.git.pull(remote, branch)
+            return str(self.git.pull(remote, branch))
 
-        return self.git.pull(remote)
+        return str(self.git.pull(remote))
 
-    def merge(self, branch: str):
+    def merge(self, branch: str) -> None:
         """Merge a branch into the current branch.
 
         Args:
@@ -172,10 +187,10 @@ class GitService:
         try:
             self.git.rev_parse(tag_name)
             return True
-        except:
+        except Exception:
             return False
 
-    def createTag(self, tag_name: str, message: str = None):
+    def createTag(self, tag_name: str, message: str | None = None) -> None:
         """Create a new tag.
 
         Args:
@@ -187,7 +202,7 @@ class GitService:
         else:
             self.git.tag(tag_name)
 
-    def deleteTag(self, tag_name: str):
+    def deleteTag(self, tag_name: str) -> None:
         """Delete a local tag.
 
         Args:
@@ -195,7 +210,7 @@ class GitService:
         """
         self.git.tag("-d", tag_name)
 
-    def deleteRemoteTag(self, tag_name: str, remote: str = "origin"):
+    def deleteRemoteTag(self, tag_name: str, remote: str = "origin") -> None:
         """Delete a remote tag.
 
         Args:
@@ -204,7 +219,7 @@ class GitService:
         """
         self.git.push(remote, "--delete", f":refs/tags/{tag_name}")
 
-    def pushTag(self, tag_name: str, remote: str = "origin"):
+    def pushTag(self, tag_name: str, remote: str = "origin") -> None:
         """Push a tag to remote.
 
         Args:
@@ -214,17 +229,13 @@ class GitService:
         self.git.push(remote, tag_name)
 
     @staticmethod
-    def buildRepo(target):
+    def buildRepo(target: str) -> Repo:
         """Build the Git repository.
 
         Args:
             target (str): The path to the Git repository.
 
         Returns:
-            git.Repo: The Git repository.
-            bool: False if the Git repository does not exist.
+            Repo: The Git repository.
         """
-        try:
-            return git.Repo(target, search_parent_directories=True)
-        except git.InvalidGitRepositoryError:
-            return False
+        return Repo(target, search_parent_directories=True)
