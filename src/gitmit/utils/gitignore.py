@@ -1,22 +1,23 @@
 """Module for parsing and matching gitignore patterns."""
 
-import os
 import re
 from pathlib import Path
-from typing import List, Optional
 
 
 class GitignoreParser:
     """Parser for gitignore-style pattern files."""
 
+    base_path: Path
+    patterns: list[tuple[str, bool]]
+
     def __init__(self, base_path: Path):
         """Initialize the gitignore parser.
-        
+
         Args:
             base_path: The base path (repository root) for pattern matching.
         """
         self.base_path = Path(base_path)
-        self.patterns: List[tuple[str, bool]] = []
+        self.patterns = []
         
     def load_patterns(self, file_path: Path) -> None:
         """Load patterns from a gitignore file.
@@ -46,7 +47,7 @@ class GitignoreParser:
                 if pattern:
                     self.patterns.append((pattern, negated))
     
-    def _gitignore_to_regex(self, pattern: str) -> Optional[str]:
+    def _gitignore_to_regex(self, pattern: str) -> str | None:
         """Convert a gitignore pattern to a regex pattern.
         
         Args:

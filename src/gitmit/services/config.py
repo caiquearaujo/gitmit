@@ -3,7 +3,7 @@
 import configparser
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Callable
 
 from pydantic import BaseModel
 
@@ -18,13 +18,13 @@ class Services(BaseModel):
     """Services for the application."""
 
     commit: LLMService
-    resume: Optional[LLMService]
+    resume: LLMService | None
     database: LLMUsageDatabaseService
     path: str
     file_created: bool = False
 
     class Config:
-        arbitrary_types_allowed = True
+        arbitrary_types_allowed: bool = True
 
 
 def __required_param(config: configparser.ConfigParser, section: str, param: str):
@@ -39,7 +39,7 @@ def __required_param(config: configparser.ConfigParser, section: str, param: str
         raise ValueError(f"Missing required parameter '{param}' in section '{section}'")
 
 
-def __parse_model(model: str, allow_none=False) -> Optional[dict[str, str]]:
+def __parse_model(model: str, allow_none: bool = False) -> dict[str, str] | None:
     """Parse the model from the config.
 
     Args:
@@ -78,7 +78,7 @@ def __evaluate(
 
     database = LLMUsageDatabaseService(connection)
 
-    services = {
+    services: dict[str, Callable[[configparser.ConfigParser, str], LLMService]] = {
         "google": lambda c, m: GoogleLLMService(
             api_key=c.get("google", "api_key"), database=database, model=m
         ),
@@ -91,13 +91,13 @@ def __evaluate(
         ),
     }
 
-    commit_validators = {
+    commit_validators: dict[str, Callable[[configparser.ConfigParser], None]] = {
         "google": lambda c: __required_param(c, "google", "api_key"),
         "ollama": lambda c: __required_param(c, "ollama", "host"),
         "openrouter": lambda c: __required_param(c, "openrouter", "api_key"),
     }
 
-    resume_validators = {
+    resume_validators: dict[str, Callable[[configparser.ConfigParser], None]] = {
         "ollama": lambda c: __required_param(c, "ollama", "host"),
     }
 

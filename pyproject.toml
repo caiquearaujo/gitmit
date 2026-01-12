@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
     "GitPython==3.1.44",
-    "google-genai==1.9.0",
+    "google-genai==1.57.0",
     "mysql-connector-python==9.2.0",
     "ollama==0.4.7",
     "requests==2.32.3",
@@ -23,3 +23,6 @@ authors = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"gitmit.resources" = [".prompts/*.txt"]

@@ -1,13 +1,19 @@
 """Service for the SQLite database."""
 
-import mysql.connector
 import sys
-
-from pydantic import BaseModel
-from pathlib import Path
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, Any
+
+import mysql.connector
+from pydantic import BaseModel
 
 from ..utils.terminal import display_error
+
+if TYPE_CHECKING:
+    from mysql.connector.abstracts import MySQLConnectionAbstract
+    from mysql.connector.pooling import PooledMySQLConnection
+
+    MySQLConnection = PooledMySQLConnection | MySQLConnectionAbstract
 
 
 class ConnectionModel(BaseModel):
@@ -23,6 +29,10 @@ class ConnectionModel(BaseModel):
 class LLMUsageDatabaseService:
     """Service for the management of LLM usage on a SQLite database."""
 
+    connection: ConnectionModel
+    mysql_client: "MySQLConnection | None"
+    connected: bool
+
     def __init__(self, connection: ConnectionModel):
         """Initialize the database class.
 
@@ -33,10 +43,10 @@ class LLMUsageDatabaseService:
         self.mysql_client = None
         self.connected = False
 
-    def start(self):
+    def start(self) -> None:
         """Start the connection to the database."""
         if self.connected:
-            return self.mysql_client
+            return
 
         try:
             self.mysql_client = mysql.connector.connect(
@@ -56,11 +66,11 @@ class LLMUsageDatabaseService:
 
             self.__create_table()
             self.connected = True
-            return self.mysql_client
         except Exception as e:
             display_error(
                 f"Unknown error when connecting to MySQL. Fix it before continue. See: {e}"
             )
+            sys.exit(1)
 
     def close(self):
         """Close the connection to the database."""
@@ -77,12 +87,13 @@ class LLMUsageDatabaseService:
             display_error(f"An error occurred while closing the MySQL client: {e}")
             sys.exit(1)
 
-    def __create_table(self):
+    def __create_table(self) -> None:
         """Create the table if it doesn't exist."""
         if self.mysql_client is None:
             display_error("You must start the MySQL client before continue.")
             sys.exit(1)
 
+        cursor: Any = None
         try:
             cursor = self.mysql_client.cursor()
 
@@ -104,9 +115,10 @@ class LLMUsageDatabaseService:
             display_error(f"An error occurred while creating the table: {e}")
             sys.exit(1)
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
-    def insert_token_usage(self, tokens_used: int, model: str):
+    def insert_token_usage(self, tokens_used: int, model: str) -> None:
         """Insert the token usage into the table.
 
         Args:
@@ -121,6 +133,7 @@ class LLMUsageDatabaseService:
             display_error("You must start the MySQL client before continue.")
             sys.exit(1)
 
+        cursor: Any = None
         try:
             cursor = self.mysql_client.cursor()
 
@@ -134,7 +147,8 @@ class LLMUsageDatabaseService:
             display_error(f"An error occurred while inserting the token usage: {e}")
             sys.exit(1)
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
     def current_month_tokens_used(self, model: str) -> int:
         """Get the current month tokens used.
@@ -146,6 +160,7 @@ class LLMUsageDatabaseService:
             display_error("You must start the MySQL client before continue.")
             sys.exit(1)
 
+        cursor: Any = None
         try:
             cursor = self.mysql_client.cursor(dictionary=True)
 
@@ -154,7 +169,7 @@ class LLMUsageDatabaseService:
                 (datetime.now().year, datetime.now().month, model, model),
             )
 
-            fetch = cursor.fetchone()
+            fetch: dict[str, Any] | None = cursor.fetchone()
 
             if fetch is None:
                 return 0
@@ -166,20 +181,22 @@ class LLMUsageDatabaseService:
             )
             sys.exit(1)
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
 
-    def flush_old_tokens(self):
+    def flush_old_tokens(self) -> None:
         """Flush old tokens usage before last 30 days."""
         if self.mysql_client is None:
             display_error("You must start the MySQL client before continue.")
             sys.exit(1)
 
+        cursor: Any = None
         try:
             cursor = self.mysql_client.cursor()
 
             cursor.execute(
-                "DELETE FROM `tokens_counter` WHERE `timestamp` < ?",
-                (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S"),
+                "DELETE FROM `tokens_counter` WHERE `timestamp` < %s",
+                ((datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S"),),
             )
 
             self.mysql_client.commit()
@@ -187,4 +204,5 @@ class LLMUsageDatabaseService:
             display_error(f"An error occurred while flushing old tokens: {e}")
             sys.exit(1)
         finally:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()

@@ -1,0 +1,47 @@
+## CHANGE ANALYSIS (Pre-computed)
+{{CHANGE_ANALYSIS}}
+
+## GUIDANCE FOR LARGE CHANGES
+
+This is a **SIGNIFICANT change** affecting multiple files/components.
+
+### Analysis Strategy
+1. **Identify the primary purpose**:
+   - What is the main goal of these changes?
+   - Are multiple related changes bundled together?
+   - Is there a central theme connecting the changes?
+
+2. **Type Selection**:
+   - `feat`: New user-facing capability (new module, new feature, new API)
+   - `refactor`: Major restructuring without behavior change
+   - `enhancement`: Significant improvement to existing functionality
+   - `perf`: Performance-focused changes across the codebase
+
+3. **Description Requirements**:
+   - **short_description**: Capture the overall theme in <80 chars
+   - **description**:
+     - Summarize the main changes
+     - List key affected areas/modules
+     - Explain the motivation
+     - Note any breaking changes or important considerations
+
+### User Explanation
+If the user provided an explanation, it defines the commit's purpose. Your job is to:
+- Expand on their explanation with technical details
+- Ensure the type matches their stated intent
+- Use their terminology
+
+## CODE CHANGES
+```
+{{CHANGES}}
+```
+
+{{USER_EXPLANATION_SECTION}}
+
+## YOUR TASK
+Generate a comprehensive commit message for this significant change that:
+1. Captures the overall purpose clearly
+2. Uses the most appropriate commit type
+3. Provides detailed but concise descriptions
+4. References key files/modules affected
+5. Respects the user's stated intent if provided
