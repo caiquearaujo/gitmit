@@ -8,6 +8,9 @@ the LLM understand the context and magnitude of modifications.
 import re
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Dict, List
+
+from ..resources.files import File
 
 
 class ChangeMagnitude(Enum):
@@ -196,11 +199,11 @@ class ChangeAnalyzer:
         self._func_re = [re.compile(p, re.MULTILINE) for p in self.FUNCTION_PATTERNS]
         self._class_re = [re.compile(p, re.MULTILINE) for p in self.CLASS_PATTERNS]
 
-    def _matches_any(self, text: str, patterns: list[re.Pattern]) -> bool:
+    def _matches_any(self, text: str, patterns: List[re.Pattern[str]]) -> bool:
         """Check if text matches any of the compiled patterns."""
         return any(p.search(text) for p in patterns)
 
-    def _categorize_file(self, filename: str) -> dict:
+    def _categorize_file(self, filename: str) -> Dict[str, bool]:
         """Categorize a file based on its name/path."""
         return {
             "is_config": self._matches_any(filename, self._config_re),
@@ -209,7 +212,7 @@ class ChangeAnalyzer:
             "is_dependency": self._matches_any(filename, self._dep_re),
         }
 
-    def _analyze_diff_content(self, content: str) -> dict:
+    def _analyze_diff_content(self, content: str) -> Dict[str, Any]:
         """Analyze diff content for specific patterns."""
         has_function_changes = self._matches_any(content, self._func_re)
         has_class_changes = self._matches_any(content, self._class_re)
@@ -479,7 +482,7 @@ class ChangeAnalyzer:
 
         return hints
 
-    def analyze(self, files: list) -> ChangeAnalysis:
+    def analyze(self, files: List[File]) -> ChangeAnalysis:
         """
         Analyze a list of File objects and return a comprehensive analysis.
 

@@ -2,7 +2,7 @@
 
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 from git import Repo
 from pydantic import BaseModel
@@ -69,7 +69,7 @@ class GitignoreParser:
         return False
 
 
-def _get_gitignore_parser(repo: Repo) -> Optional[GitignoreParser]:
+def _get_gitignore_parser(repo: Repo) -> GitignoreParser | None:
     """Get a GitignoreParser if .gitmitignore exists.
 
     Args:
@@ -88,7 +88,7 @@ def _get_gitignore_parser(repo: Repo) -> Optional[GitignoreParser]:
 
 
 def load_untracked_files(
-    repo: Repo, ignore_parser: Optional[GitignoreParser] = None
+    repo: Repo, ignore_parser: GitignoreParser | None = None
 ) -> list[File]:
     """Load untracked files from the given repository.
 
@@ -124,7 +124,7 @@ def load_untracked_files(
 
 
 def load_modified_files(
-    repo: Repo, ignore_parser: Optional[GitignoreParser] = None
+    repo: Repo, ignore_parser: GitignoreParser | None = None
 ) -> list[File]:
     """Load modified files from the given repository.
 

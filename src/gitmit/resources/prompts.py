@@ -9,7 +9,6 @@ import pkgutil
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 from .analyzer import ChangeAnalysis, ChangeMagnitude
 
@@ -20,13 +19,6 @@ class PromptPair:
 
     system_prompt: str
     user_prompt: str
-
-    def to_dict(self) -> dict:
-        """Convert to a dictionary for API calls."""
-        return {
-            "system": self.system_prompt,
-            "user": self.user_prompt,
-        }
 
 
 class PromptBuilder:
@@ -43,7 +35,7 @@ class PromptBuilder:
     # Placeholder pattern: {{PLACEHOLDER_NAME}}
     PLACEHOLDER_PATTERN = re.compile(r"\{\{(\w+)\}\}")
 
-    def __init__(self, prompts_dir: Optional[Path] = None):
+    def __init__(self, prompts_dir: Path | None = None):
         """
         Initialize the PromptBuilder.
 
@@ -112,9 +104,9 @@ class PromptBuilder:
             Template with placeholders replaced
         """
 
-        def replacer(match):
+        def replacer(match: re.Match[str]) -> str:
             key = match.group(1)
-            return values.get(key, match.group(0))  # Keep original if not found
+            return values.get(key, match.group(0))
 
         return self.PLACEHOLDER_PATTERN.sub(replacer, template)
 
@@ -135,7 +127,7 @@ class PromptBuilder:
         else:  # LARGE, MAJOR
             return "major_changes"
 
-    def _format_user_explanation_section(self, explanation: Optional[str]) -> str:
+    def _format_user_explanation_section(self, explanation: str | None) -> str:
         """
         Format the user explanation section for inclusion in prompts.
 
@@ -165,7 +157,7 @@ This explanation should:
         changes_content: str,
         commit_types_csv: str,
         analysis: ChangeAnalysis,
-        user_explanation: Optional[str] = None,
+        user_explanation: str | None = None,
         no_feat: bool = False,
     ) -> PromptPair:
         """
@@ -225,7 +217,7 @@ Choose from: enhancement, refactor, chore, bugfix, style, or other appropriate t
     def build_resume_prompt(
         self,
         changes_content: str,
-        user_explanation: Optional[str] = None,
+        user_explanation: str | None = None,
     ) -> str:
         """
         Build a prompt for summarizing changes.

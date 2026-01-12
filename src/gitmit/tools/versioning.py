@@ -1,16 +1,17 @@
 """Versioning tool for managing version tags."""
 
 import re
-from pydantic import BaseModel
 
-from ..services.git import GitService
+from pydantic import BaseModel
+from rich.panel import Panel
+
 from ..services.config import Services
+from ..services.git import GitService
 from ..utils.terminal import (
     display_error,
-    display_warning,
     display_info,
     display_success,
-    Panel,
+    display_warning,
 )
 
 
@@ -32,9 +33,9 @@ class VersioningTool:
         if not git_service.exists():
             raise ValueError("No git repository found.")
 
-        self.git_service = git_service
-        self.services = services
-        self.settings = settings
+        self.git_service: GitService = git_service
+        self.services: Services = services
+        self.settings: VersioningSettings = settings
 
     def is_valid_semver(self, version: str) -> bool:
         """Check if version string is valid SemVer format.
@@ -58,11 +59,13 @@ class VersioningTool:
 
         display_info(
             Panel(
-                f"Version: [bold yellow]{version}[/bold yellow]\n"
-                f"Tag: [bold yellow]{tag_name}[/bold yellow]\n"
-                f"Origin Branch: [bold yellow]{origin}[/bold yellow]\n"
-                f"Force: [bold yellow]{'Yes' if self.settings.force else 'No'}[/bold yellow]\n"
-                f"Push: [bold yellow]{'Yes' if self.settings.push else 'No'}[/bold yellow]",
+                (
+                    f"Version: [bold yellow]{version}[/bold yellow]\n"
+                    f"Tag: [bold yellow]{tag_name}[/bold yellow]\n"
+                    f"Origin Branch: [bold yellow]{origin}[/bold yellow]\n"
+                    f"Force: [bold yellow]{'Yes' if self.settings.force else 'No'}[/bold yellow]\n"
+                    f"Push: [bold yellow]{'Yes' if self.settings.push else 'No'}[/bold yellow]"
+                ),
                 title="Versioning Configuration",
             )
         )
@@ -70,8 +73,10 @@ class VersioningTool:
         # Step 0: Validate SemVer format
         if not self.is_valid_semver(version):
             display_error(
-                f"Invalid version format: [bold red]{version}[/bold red]. "
-                "Version must be in SemVer format (e.g., 1.0.0, 2.1.3-beta, 3.0.0-rc.1)."
+                (
+                    f"Invalid version format: [bold red]{version}[/bold red]. "
+                    "Version must be in SemVer format (e.g., 1.0.0, 2.1.3-beta, 3.0.0-rc.1)."
+                )
             )
             return
 
@@ -79,17 +84,21 @@ class VersioningTool:
         current_branch = self.git_service.currentBranch()
         if current_branch != origin:
             display_error(
-                f"Current branch is [bold red]{current_branch}[/bold red], "
-                f"but expected [bold yellow]{origin}[/bold yellow]. "
-                f"Please checkout to {origin} branch first."
+                (
+                    f"Current branch is [bold red]{current_branch}[/bold red], "
+                    f"but expected [bold yellow]{origin}[/bold yellow]. "
+                    f"Please checkout to {origin} branch first."
+                )
             )
             return
 
         # Step 2: Check if there are uncommitted changes
         if self.git_service.hasChanges():
             display_error(
-                "There are uncommitted changes in the repository. "
-                "Please commit or stash them before creating a version tag."
+                (
+                    "There are uncommitted changes in the repository. "
+                    "Please commit or stash them before creating a version tag."
+                )
             )
             return
 
@@ -99,8 +108,10 @@ class VersioningTool:
 
             if tag_exists and not self.settings.force:
                 display_error(
-                    f"Tag [bold red]{tag_name}[/bold red] already exists. "
-                    "Use --force to delete and recreate it."
+                    (
+                        f"Tag [bold red]{tag_name}[/bold red] already exists. "
+                        "Use --force to delete and recreate it."
+                    )
                 )
                 return
 

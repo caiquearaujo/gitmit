@@ -1,6 +1,6 @@
 """OpenRouter LLM service."""
 
-from typing import List, Optional
+from typing import Any, override
 
 import requests
 import tiktoken
@@ -20,7 +20,7 @@ class OpenRouterLLMService(LLMService):
         api_key: str,
         database: LLMUsageDatabaseService,
         model: str = "anthropic/claude-3.5-sonnet",
-        providers: Optional[List[str]] = None,
+        providers: list[str] | None = None,
     ):
         """Initialize the OpenRouter LLM service.
 
@@ -30,25 +30,27 @@ class OpenRouterLLMService(LLMService):
             model (str, optional): The model to use. Defaults to "anthropic/claude-3.5-sonnet".
             providers (list[str], optional): List of providers to prioritize. Defaults to None.
         """
-        self.api_key = api_key
-        self.model = model
-        self.database = database
-        self.providers = (
+        self.api_key: str = api_key
+        self.model: str = model
+        self.database: LLMUsageDatabaseService = database
+        self.providers: list[str] | None = (
             [p.strip() for p in providers if p.strip()] if providers else None
         )
-        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
-        self.generator = llms.CommitPromptGenerator()
+        self.base_url: str = "https://openrouter.ai/api/v1/chat/completions"
+        self.generator: llms.CommitPromptGenerator = llms.CommitPromptGenerator()
 
+    @override
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
         self.database.start()
         return self.database.current_month_tokens_used(f"openrouter/{self.model}")
 
+    @override
     def count_tokens(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional["LLMService"] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
     ) -> int:
@@ -86,9 +88,8 @@ class OpenRouterLLMService(LLMService):
 
         return len(encoding.encode(message))
 
-    def resume_changes(
-        self, repo: Repo, explanation: Optional[str] = None
-    ) -> Optional[str]:
+    @override
+    def resume_changes(self, repo: Repo, explanation: str | None = None) -> str | None:
         """Resume changes.
 
         Args:
@@ -97,14 +98,15 @@ class OpenRouterLLMService(LLMService):
         """
         raise NotImplementedError("OpenRouter LLM does not support resume changes")
 
+    @override
     def commit_message(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional[LLMService] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
-    ) -> Optional[CommitMessage]:
+    ) -> CommitMessage | None:
         """Generate a commit message.
 
         Args:
@@ -134,7 +136,7 @@ class OpenRouterLLMService(LLMService):
         if prompt is None:
             return None
 
-        body = {
+        body: dict[str, Any] = {
             "model": self.model,
             "messages": [
                 {"role": "system", "content": prompt.system_prompt},
@@ -172,6 +174,7 @@ class OpenRouterLLMService(LLMService):
         content = data["choices"][0]["message"]["content"]
         return CommitMessage.model_validate_json(content)
 
+    @override
     def supports(self, action: LLMAction) -> bool:
         """Check if the LLM supports the action.
 

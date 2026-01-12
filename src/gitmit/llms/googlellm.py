@@ -1,6 +1,6 @@
 """Google LLM service."""
 
-from typing import Optional
+from typing import override
 
 from git import Repo
 from google import genai
@@ -22,21 +22,23 @@ class GoogleLLMService(LLMService):
         model: str = "gemini-2.0-flash",
     ):
         """Initialize the Google LLM service."""
-        self.client = genai.Client(api_key=api_key)
-        self.model = model
-        self.database = database
-        self.generator = llms.CommitPromptGenerator()
+        self.client: genai.Client = genai.Client(api_key=api_key)
+        self.model: str = model
+        self.database: LLMUsageDatabaseService = database
+        self.generator: llms.CommitPromptGenerator = llms.CommitPromptGenerator()
 
+    @override
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
         self.database.start()
         return self.database.current_month_tokens_used(f"google/{self.model}")
 
+    @override
     def count_tokens(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional["LLMService"] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
     ) -> int:
@@ -45,38 +47,38 @@ class GoogleLLMService(LLMService):
         Args:
             prompt (str): The prompt to count the tokens.
         """
-        prompt = None
+        try:
+            prompt = None
 
-        if resume is not None:
-            _resume = resume.resume_changes(repo, explanation=explanation)
+            if resume is not None:
+                _resume = resume.resume_changes(repo, explanation=explanation)
 
-            if _resume is not None:
-                prompt = self.generator.generate_from_resume(
-                    _resume,
-                    explanation=explanation,
-                    no_feat=no_feat,
+                if _resume is not None:
+                    prompt = self.generator.generate_from_resume(
+                        _resume,
+                        explanation=explanation,
+                        no_feat=no_feat,
+                    )
+            else:
+                prompt = self.generator.generate(
+                    repo, explanation=explanation, no_feat=no_feat, debug=debug
                 )
-        else:
-            prompt = self.generator.generate(
-                repo, explanation=explanation, no_feat=no_feat, debug=debug
+
+            if prompt is None:
+                return 0
+
+            # type: ignore
+            tokens = self.client.models.count_tokens(
+                model=self.model,
+                contents=f"{prompt.system_prompt}\n\n{prompt.user_prompt}",
             )
 
-        if prompt is None:
+            return int(getattr(tokens, "total_tokens", 0))
+        except Exception:
             return 0
 
-        tokens = self.client.models.count_tokens(
-            model=self.model,
-            contents=f"{prompt.system_prompt}\n\n{prompt.user_prompt}",
-        )
-
-        if tokens is None:
-            return 0
-
-        return int(getattr(tokens, "total_tokens", 0))
-
-    def resume_changes(
-        self, repo: Repo, explanation: Optional[str] = None
-    ) -> Optional[str]:
+    @override
+    def resume_changes(self, repo: Repo, explanation: str | None = None) -> str | None:
         """Resume changes.
 
         Args:
@@ -85,14 +87,15 @@ class GoogleLLMService(LLMService):
         """
         raise NotImplementedError("Google LLM does not support resume changes")
 
+    @override
     def commit_message(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional[LLMService] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
-    ) -> Optional[CommitMessage]:
+    ) -> CommitMessage | None:
         """Generate a commit message.
 
         Args:
@@ -122,6 +125,7 @@ class GoogleLLMService(LLMService):
         if prompt is None:
             return None
 
+        # type: ignore
         response = self.client.models.generate_content(
             model=self.model,
             contents=prompt.user_prompt,
@@ -132,14 +136,17 @@ class GoogleLLMService(LLMService):
             ),
         )
 
-        if response is None:
+        text = response.text
+        total = int(getattr(response.usage_metadata, "total_token_count", 0))
+
+        self.database.insert_token_usage(total, f"google/{self.model}")
+
+        if text is None:
             return None
 
-        self.database.insert_token_usage(
-            response.usage_metadata.total_token_count, f"google/{self.model}"
-        )
-        return CommitMessage.model_validate_json(response.text)
+        return CommitMessage.model_validate_json(text)
 
+    @override
     def supports(self, action: LLMAction) -> bool:
         """Check if the LLM supports the action.
 

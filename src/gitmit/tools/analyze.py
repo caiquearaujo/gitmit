@@ -1,5 +1,7 @@
 """Analyze current repository changes."""
 
+from git.repo import Repo
+
 from ..resources.analyzer import ChangeMagnitude
 from ..resources.llms import CommitPromptGenerator
 from ..services.config import Services
@@ -18,8 +20,8 @@ class AnalyzeTool:
         if not git_service.exists():
             raise ValueError("No git repository found.")
 
-        self.git_service = git_service
-        self.services = services
+        self.git_service: GitService = git_service
+        self.services: Services = services
 
     def run(self):
         """Run the analyze tool."""
@@ -27,7 +29,7 @@ class AnalyzeTool:
             display_warning("No changes to analyze.")
             return
 
-        result = CommitPromptGenerator().generate(self.git_service.repo)
+        result = CommitPromptGenerator().generate(self.__get_repo())
 
         if result:
             analysis = result.analysis
@@ -47,3 +49,11 @@ class AnalyzeTool:
             # Warnings from analysis
             for warning in analysis.warnings:
                 print(f"Warning: {warning}")
+
+    def __get_repo(self) -> Repo:
+        repo = self.git_service.repo
+
+        if repo is False:
+            raise RuntimeError("Cannot get the current git repository...")
+
+        return repo

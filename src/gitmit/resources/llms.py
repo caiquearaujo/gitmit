@@ -2,12 +2,13 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List
 
 import git
 
 from .analyzer import ChangeAnalysis, ChangeAnalyzer
 from .files import (
+    File,
     _get_gitignore_parser,
     load_all,
     load_modified_files,
@@ -51,7 +52,7 @@ class CommitPromptGenerator:
     - Building appropriate prompts based on analysis
     """
 
-    def __init__(self, prompts_dir: Optional[Path] = None):
+    def __init__(self, prompts_dir: Path | None = None):
         """
         Initialize the generator.
 
@@ -64,10 +65,10 @@ class CommitPromptGenerator:
     def generate(
         self,
         repo: git.Repo,
-        explanation: Optional[str] = None,
+        explanation: str | None = None,
         no_feat: bool = False,
         debug: bool = False,
-    ) -> Optional[CommitPromptResult]:
+    ) -> CommitPromptResult | None:
         """
         Generate prompts for commit message creation.
 
@@ -116,7 +117,7 @@ class CommitPromptGenerator:
     def generate_from_resume(
         self,
         resume: str,
-        explanation: Optional[str] = None,
+        explanation: str | None = None,
         no_feat: bool = False,
     ) -> PromptPair:
         """
@@ -157,7 +158,7 @@ class CommitPromptGenerator:
             no_feat=no_feat,
         )
 
-    def _build_changes_string(self, files: list) -> str:
+    def _build_changes_string(self, files: List[File]) -> str:
         """Build the raw changes string from file list."""
         txt = []
         for file in files:
@@ -166,7 +167,7 @@ class CommitPromptGenerator:
             txt.append("<<<< end of file")
         return "\n".join(txt)
 
-    def _print_debug(self, analysis: ChangeAnalysis, files: list):
+    def _print_debug(self, analysis: ChangeAnalysis, files: List[File]):
         """Print debug information about the analysis."""
         # Import here to avoid circular dependency
         try:
@@ -202,9 +203,9 @@ class CommitPromptGenerator:
 
 def generate_resume_prompt(
     repo: git.Repo,
-    explanation: Optional[str] = None,
-    prompts_dir: Optional[Path] = None,
-) -> Optional[str]:
+    explanation: str | None = None,
+    prompts_dir: Path | None = None,
+) -> str | None:
     """
     Generate a prompt for summarizing repository changes.
 

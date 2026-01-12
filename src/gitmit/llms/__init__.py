@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional
 
 from git import Repo
 
@@ -29,8 +28,8 @@ class LLMService(ABC):
     def count_tokens(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional["LLMService"] = None,
+        explanation: str | None = None,
+        resume: "LLMService | None" = None,
         no_feat: bool = False,
         debug: bool = False,
     ) -> int:
@@ -46,9 +45,7 @@ class LLMService(ABC):
         """
 
     @abstractmethod
-    def resume_changes(
-        self, repo: Repo, explanation: Optional[str] = None
-    ) -> Optional[str]:
+    def resume_changes(self, repo: Repo, explanation: str | None = None) -> str | None:
         """Resume changes.
 
         Args:
@@ -63,11 +60,11 @@ class LLMService(ABC):
     def commit_message(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional["LLMService"] = None,
+        explanation: str | None = None,
+        resume: "LLMService | None" = None,
         no_feat: bool = False,
         debug: bool = False,
-    ) -> Optional[CommitMessage]:
+    ) -> CommitMessage | None:
         """Generate a commit message.
 
         Args:

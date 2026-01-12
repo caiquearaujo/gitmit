@@ -16,6 +16,7 @@ from .utils.terminal import (
     display_error,
     display_info,
     display_success,
+    display_warning,
 )
 
 __VERSION__ = "0.6.0"
@@ -97,24 +98,33 @@ def startup(args):
         ).run(),
     }
 
-    func = switcher.get(args.command, False)
+    func = switcher.get(args.command, None)
 
-    if func == False:
+    if not func:
         display_error(
             "The command {command} was not found.".format(command=args.command),
         )
 
         return
 
-    if type(func) == dict:
+    if isinstance(func, dict):
         func = func.get(args.action, False)
 
-        if func == False:
+        if not func:
             display_error(
                 "The action {action} was not found for {command}.".format(
                     action=args.action, command=args.command
                 ),
             )
+
+            return
+
+    if not callable(func):
+        display_error(
+            "Unexpected error for {command}.".format(command=args.command),
+        )
+
+        return
 
     func()
 
@@ -126,6 +136,8 @@ def main():
 
     try:
         startup(args)
+    except KeyboardInterrupt:
+        display_warning("Interruping application...")
     except Exception as e:
         display_error(f"An unexpected error occurred. See: {e}.")
     finally:

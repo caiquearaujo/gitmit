@@ -1,15 +1,15 @@
 """Merge tool for merging branches."""
 
 from pydantic import BaseModel
+from rich.panel import Panel
 
-from ..services.git import GitService
 from ..services.config import Services
+from ..services.git import GitService
 from ..utils.terminal import (
     display_error,
-    display_warning,
     display_info,
     display_success,
-    Panel,
+    display_warning,
 )
 
 
@@ -30,9 +30,9 @@ class MergeTool:
         if not git_service.exists():
             raise ValueError("No git repository found.")
 
-        self.git_service = git_service
-        self.services = services
-        self.settings = settings
+        self.git_service: GitService = git_service
+        self.services: Services = services
+        self.settings: MergeSettings = settings
 
     def run(self):
         """Run the merge tool."""
@@ -42,9 +42,11 @@ class MergeTool:
 
         display_info(
             Panel(
-                f"Origin: [bold yellow]{origin}[/bold yellow]\n"
-                f"Destination: [bold yellow]{destination}[/bold yellow]\n"
-                f"Push: [bold yellow]{'Yes' if self.settings.push else 'No'}[/bold yellow]",
+                (
+                    f"Origin: [bold yellow]{origin}[/bold yellow]\n"
+                    f"Destination: [bold yellow]{destination}[/bold yellow]\n"
+                    f"Push: [bold yellow]{'Yes' if self.settings.push else 'No'}[/bold yellow]"
+                ),
                 title="Merge Configuration",
             )
         )
@@ -53,17 +55,21 @@ class MergeTool:
         current_branch = self.git_service.currentBranch()
         if current_branch != origin:
             display_error(
-                f"Current branch is [bold red]{current_branch}[/bold red], "
-                f"but expected [bold yellow]{origin}[/bold yellow]. "
-                f"Please checkout to {origin} branch first."
+                (
+                    f"Current branch is [bold red]{current_branch}[/bold red], "
+                    f"but expected [bold yellow]{origin}[/bold yellow]. "
+                    f"Please checkout to {origin} branch first."
+                )
             )
             return
 
         # Step 2: Check if there are uncommitted changes
         if self.git_service.hasChanges():
             display_error(
-                "There are uncommitted changes in the repository. "
-                "Please commit or stash them before merging."
+                (
+                    "There are uncommitted changes in the repository. "
+                    "Please commit or stash them before merging."
+                )
             )
             return
 
@@ -85,8 +91,10 @@ class MergeTool:
             # Check if there were updates
             if pull_result and "Already up to date" not in str(pull_result):
                 display_warning(
-                    f"The {destination} branch was updated from remote. "
-                    "Please review the changes before proceeding with the merge."
+                    (
+                        f"The {destination} branch was updated from remote. "
+                        "Please review the changes before proceeding with the merge."
+                    )
                 )
                 # Switch back to origin branch
                 self.git_service.checkout(origin)
@@ -109,8 +117,10 @@ class MergeTool:
 
             display_success(
                 Panel(
-                    f"✅ Successfully merged [bold green]{origin}[/bold green] "
-                    f"into [bold green]{destination}[/bold green]",
+                    (
+                        f"✅ Successfully merged [bold green]{origin}[/bold green] "
+                        f"into [bold green]{destination}[/bold green]"
+                    ),
                     title="Merge Complete",
                 )
             )
@@ -123,5 +133,5 @@ class MergeTool:
                 if current != origin:
                     display_info(f"Returning to {origin} branch...")
                     self.git_service.checkout(origin)
-            except:
+            except Exception:
                 pass

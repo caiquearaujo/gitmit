@@ -1,6 +1,6 @@
 """Ollama LLM service."""
 
-from typing import Optional
+from typing import override
 
 import tiktoken
 from git import Repo
@@ -18,19 +18,21 @@ class OllamaLLMService(LLMService):
         self, host: str = "http://localhost:11434", model: str = "llama3.1:8b"
     ):
         """Initialize the Ollama LLM service."""
-        self.client = Client(host=host)
-        self.model = model
-        self.generator = llms.CommitPromptGenerator()
+        self.client: Client = Client(host=host)
+        self.model: str = model
+        self.generator: llms.CommitPromptGenerator = llms.CommitPromptGenerator()
 
+    @override
     def tokens_used(self) -> int:
         """Get the number of tokens used."""
         raise NotImplementedError("Tokens used is not implemented for Ollama LLM")
 
+    @override
     def count_tokens(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional["LLMService"] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
     ) -> int:
@@ -63,11 +65,12 @@ class OllamaLLMService(LLMService):
 
         return len(encoding.encode(message))
 
+    @override
     def resume_changes(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-    ) -> Optional[str]:
+        explanation: str | None = None,
+    ) -> str | None:
         """Resume changes.
 
         Args:
@@ -84,19 +87,17 @@ class OllamaLLMService(LLMService):
             prompt=prompt,
         )
 
-        if response is None:
-            return None
+        return getattr(response, "response", None)
 
-        return response["response"]
-
+    @override
     def commit_message(
         self,
         repo: Repo,
-        explanation: Optional[str] = None,
-        resume: Optional[LLMService] = None,
+        explanation: str | None = None,
+        resume: LLMService | None = None,
         no_feat: bool = False,
         debug: bool = False,
-    ) -> Optional[CommitMessage]:
+    ) -> CommitMessage | None:
         """Generate a commit message.
 
         Args:
@@ -120,11 +121,9 @@ class OllamaLLMService(LLMService):
             format=CommitMessage.model_json_schema(),
         )
 
-        if response is None:
-            return None
-
         return CommitMessage.model_validate_json(response["response"])
 
+    @override
     def supports(self, action: LLMAction) -> bool:
         """Check if the LLM supports the action.
 
