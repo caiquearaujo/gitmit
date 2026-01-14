@@ -19,7 +19,7 @@ from .utils.terminal import (
     display_warning,
 )
 
-__VERSION__ = "0.6.0"
+__VERSION__ = "0.6.1"
 __REPO__ = "caiquearaujo/gitmit"
 config = init()
 
@@ -41,7 +41,14 @@ def startup(args):
         ConfigTool(services=config).run()
         return
 
-    service = GitService(args.path)
+    if args.command == "update":
+        # Update command does not require a git repository
+        UpdateTool(__VERSION__, __REPO__).run(args.force)
+        return
+
+    # Only init command does not require an existing git repository
+    require_repo = args.command != "init"
+    service = GitService(args.path, require_repo=require_repo)
 
     env = [
         f"Configuration file: [bold yellow]{config.path}[/bold yellow]",
@@ -85,7 +92,6 @@ def startup(args):
                 push=args.push,
             ),
         ).run(),
-        "update": lambda: UpdateTool(__VERSION__, __REPO__).run(args.force),
         "versioning": lambda: VersioningTool(
             service,
             services=config,

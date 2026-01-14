@@ -1,8 +1,8 @@
 """Git service."""
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
-from git import Git, Repo
+from git import Git, InvalidGitRepositoryError, NoSuchPathError, Repo
 
 if TYPE_CHECKING:
     from git.remote import Remote
@@ -14,29 +14,32 @@ class GitService:
 
     Args:
         path (str): The path to the Git repository.
+        require_repo (bool): Whether to require an existing Git repository.
     """
 
-    repo: Repo | Literal[False]
+    repo: Repo | None
     path: str
     git: Git
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, require_repo: bool = True):
         """Initialize the GitService class.
 
         Args:
             path (str): The path to the Git repository.
+            require_repo (bool): Whether to require an existing Git repository.
         """
-        self.repo = GitService.buildRepo(path)
         self.path = path
+        self.repo = None
 
-        if self.repo is not False:
+        if require_repo:
+            self.repo = GitService.buildRepo(path)
             self.git = self.repo.git
 
-    def getRepo(self) -> Repo | Literal[False]:
+    def getRepo(self) -> Repo | None:
         """Get the Git repository.
 
         Returns:
-            Repo: The Git repository.
+            Repo: The Git repository or None if not initialized.
         """
         return self.repo
 
@@ -51,7 +54,7 @@ class GitService:
         Returns:
             bool: True if the Git repository exists, False otherwise.
         """
-        return self.repo is not False
+        return self.repo is not None
 
     def getPath(self) -> str:
         """Get the path to the Git repository.
@@ -59,7 +62,7 @@ class GitService:
         Returns:
             str: The path to the Git repository.
         """
-        if self.repo is False:
+        if self.repo is None:
             return self.path
 
         return str(self.repo.working_dir)
@@ -107,7 +110,7 @@ class GitService:
         self.git.remote("add", name, url)
 
     def remoteExists(self, name: str) -> bool:
-        if self.repo is False:
+        if self.repo is None:
             return False
 
         remotes: "IterableList[Remote]" = self.repo.remotes
@@ -237,5 +240,11 @@ class GitService:
 
         Returns:
             Repo: The Git repository.
+
+        Raises:
+            ValueError: If the path is not a valid Git repository.
         """
-        return Repo(target, search_parent_directories=True)
+        try:
+            return Repo(target, search_parent_directories=True)
+        except (InvalidGitRepositoryError, NoSuchPathError):
+            raise RuntimeError(f"You must have a git repository on path '{target}'.")
