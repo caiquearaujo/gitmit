@@ -312,7 +312,7 @@ class CommitTool:
     def __get_repo(self) -> Repo:
         repo = self.git_service.repo
 
-        if repo is False:
+        if repo is None:
             raise RuntimeError("Cannot get the current git repository...")
 
         return repo
