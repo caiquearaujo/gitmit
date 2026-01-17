@@ -1,28 +1,40 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "gitmit"
 version = "0.6.1"
 description = "Gitmit is a tool that helps you to manage your git repositories."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
-    "GitPython==3.1.44",
-    "google-genai==1.57.0",
-    "mysql-connector-python==9.2.0",
-    "ollama==0.4.7",
-    "requests==2.32.5",
-    "rich==14.0.0",
-    "tiktoken==0.9.0"
+    "GitPython>=3.1.44",
+    "google-genai>=1.57.0",
+    "mysql-connector-python>=9.2.0",
+    "ollama>=0.4.7",
+    "requests>=2.32.5",
+    "rich>=14.0.0",
+    "tiktoken>=0.9.0",
 ]
 authors = [
     { name = "Caique Araujo", email = "caique@piggly.com.br" }
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[project.scripts]
+gitmit = "gitmit:main"
 
-[tool.setuptools.package-data]
-"gitmit.resources" = [".prompts/*.txt"]
+[dependency-groups]
+dev = [
+    "pex>=2.33.7",
+    "basedpyright>=1.37.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gitmit"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+
+[tool.uv]
+package = true

@@ -1,6 +1,6 @@
 # Gitmit
 
-![Python](https://img.shields.io/badge/language-python-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.5.0-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/python-3.10+-green?style=for-the-badge) ![Version](https://img.shields.io/badge/version-v0.6.1-purple?style=for-the-badge) ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge) ![UV](https://img.shields.io/badge/uv-package%20manager-blueviolet?style=for-the-badge)
 
 ![Gitmit Preview](./gitmit-preview.png)
 
@@ -50,6 +50,8 @@ The main goal for this feature is keeping track the token usage across different
 
 ### From Source
 
+This project uses [UV](https://docs.astral.sh/uv/) as the package manager.
+
 1. Clone the repository:
 
    ```bash
@@ -57,23 +59,26 @@ The main goal for this feature is keeping track the token usage across different
    cd gitmit
    ```
 
-2. Create and activate a virtual environment:
+2. Install UV (if not already installed):
 
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   # On macOS and Linux
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # On Windows
+   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
    ```
 
-3. Install dependencies:
+3. Install dependencies and set up the environment:
 
    ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
 
 4. Build the executable:
 
    ```bash
-   python build.py
+   uv run python build.py
    ```
 
 5. Move the file to `/usr/local/bin/gitmit` or any other directory you want:
@@ -91,6 +96,29 @@ The main goal for this feature is keeping track the token usage across different
    ```
 
 > When you set another bin directory, you need to update the `PATH` environment variable to include the new directory.
+
+### Development
+
+After setting up with UV, you can run the project in development mode:
+
+```bash
+# Run gitmit directly
+uv run gitmit [command]
+
+# Or activate the virtual environment
+source .venv/bin/activate
+gitmit [command]
+```
+
+To add new dependencies:
+
+```bash
+# Add a runtime dependency
+uv add <package>
+
+# Add a development dependency
+uv add --group dev <package>
+```
 
 ## Configuration
 

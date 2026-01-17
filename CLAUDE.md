@@ -11,7 +11,7 @@ Gitmit is a Python-based Git repository manager that uses AI (Google Gemini or O
 ### Build and Install
 ```bash
 # Build the PEX executable
-python build.py
+uv run python build.py
 
 # The build creates: /tmp/gitmit/gitmit-{version}.pex
 # Install to system (requires sudo)
@@ -21,15 +21,14 @@ sudo chmod +x /usr/local/bin/gitmit
 
 ### Development Setup
 ```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# Install UV (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies and create virtual environment
+uv sync
 
 # Run in development mode
-python -m src.gitmit [command]
+uv run gitmit [command]
 ```
 
 ### Code Formatting
@@ -77,15 +76,30 @@ Description
 
 Types include: feat, fix, bug, docs, style, refactor, perf, test, build, ci, chore, revert, dependencies, metadata, version, security, critical, review, other
 
+## Package Manager
+
+This project uses [UV](https://docs.astral.sh/uv/) as the package manager.
+
+```bash
+# Add a runtime dependency
+uv add <package>
+
+# Add a development dependency
+uv add --group dev <package>
+
+# Sync dependencies
+uv sync
+```
+
 ## Dependencies
 
 Key Python packages:
-- GitPython==3.1.44 (Git operations)
-- google-genai==1.9.0 (Google Gemini AI)
-- ollama==0.4.7 (Local LLM support)
-- mysql-connector-python==9.2.0 (Token tracking)
-- rich==14.0.0 (Terminal UI)
-- pex==2.33.7 (Executable packaging)
+- GitPython (Git operations)
+- google-genai (Google Gemini AI)
+- ollama (Local LLM support)
+- mysql-connector-python (Token tracking)
+- rich (Terminal UI)
+- pex (Executable packaging - dev dependency)
 
 ## Important Notes
 
